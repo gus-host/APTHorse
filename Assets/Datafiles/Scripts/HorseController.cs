@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -48,11 +49,20 @@ public class HorseController : MonoBehaviour
     public bool _raceFinished;
 
     float accelerationInput = 0f;
-    
-    private int RunStraight;
+
+    private int  RunStraight;
     private int RunDownHash;
     private int RunUpHash;
     private int IdleHash;
+
+/*    private Dictionary<string, int> tagToBoolMap = new Dictionary<string, int>
+{
+    { "Start", RunStraight },
+    { "First", RunDownHash },
+    { "Second", RunStraight },
+    { "Third", RunUpHash },
+    { "Fourth", RunStraight }
+};*/
 
     private void Start()
     {
@@ -71,11 +81,11 @@ public class HorseController : MonoBehaviour
     public void StartRace()
     {
         StartCoroutine(Move());
+        animator.SetBool(RunStraight, true);
     }
 
     IEnumerator Move()
     {
-        animator.SetTrigger(RunStraight);
         while (_canMove && index < waypoints._wayPoint.Length)
         {
             _target = waypoints._wayPoint[index];
@@ -117,9 +127,12 @@ public class HorseController : MonoBehaviour
                     {
                         index = 0;
                     }
-                    else if (totalLap <= 0)
+                    else if (totalLap <= 0 && index > waypoints._wayPoint.Length - 1)
                     {
-                        animator.SetTrigger(IdleHash);
+                        animator.SetBool(IdleHash, true);
+                        animator.SetBool(RunStraight, false);
+                        animator.SetBool(RunDownHash, false);
+                        animator.SetBool(RunUpHash, false);
                         _running = false;
                         _raceFinished = true;
                         raceManager.horses.Push(this);
@@ -134,26 +147,66 @@ public class HorseController : MonoBehaviour
             yield return null;
         }
     }
+
+
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        /*        if (tagToBoolMap.TryGetValue(collision.gameObject.tag, out int boolParameter))
+                {
+
+                    animator.SetBool(boolParameter, true);
+
+                    // Additional logic for specific cases
+                    if (boolParameter == RunStraight)
+                    {
+                        if (collision.gameObject.CompareTag("Second"))
+                        {
+                            spriteRenderer.flipX = true;
+                        }
+                        else if (collision.gameObject.CompareTag("Fourth"))
+                        {
+                            spriteRenderer.flipX = false;
+                        }
+                    }
+                }*/
+
+        Debug.Log($"Collision {collision.gameObject.tag}");
         if (collision.gameObject.CompareTag("Start"))
         {
-            animator.SetTrigger(RunStraight);
+            animator.SetBool(RunStraight, true);
+            animator.SetBool(RunDownHash, false);
+            animator.SetBool(RunUpHash, false);
+            animator.SetBool(IdleHash, false);
         }
         else if (collision.gameObject.CompareTag("First"))
         {
-            animator.SetTrigger(RunDownHash);
-        }else if (collision.gameObject.CompareTag("Second"))
+            animator.SetBool(RunDownHash, true);
+            animator.SetBool(RunStraight, false);
+            animator.SetBool(RunUpHash, false);
+            animator.SetBool(IdleHash, false);
+        }
+        else if (collision.gameObject.CompareTag("Second"))
         {
-            animator.SetTrigger(RunStraight);
+            animator.SetBool(RunStraight, true);
+            animator.SetBool(RunDownHash, false);
+            animator.SetBool(RunUpHash, false);
+            animator.SetBool(IdleHash, false);
             spriteRenderer.flipX = true;
-        }else if (collision.gameObject.CompareTag("Third"))
+        }
+        else if (collision.gameObject.CompareTag("Third"))
         {
-            animator.SetTrigger(RunUpHash);
+            animator.SetBool(RunUpHash, true);
+            animator.SetBool(RunDownHash, false);
+            animator.SetBool(RunStraight, false);
+            animator.SetBool(IdleHash, false);
         }
         else if (collision.gameObject.CompareTag("Fourth"))
         {
-            animator.SetTrigger(RunStraight);
+            animator.SetBool(RunStraight, true);
+            animator.SetBool(RunUpHash, false);
+            animator.SetBool(RunDownHash, false);
+            animator.SetBool(IdleHash, false);
             spriteRenderer.flipX = false;
         }
     }
