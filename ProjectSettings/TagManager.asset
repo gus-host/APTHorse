@@ -3,7 +3,14 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Start
+  - Second
+  - First
+  - Third
+  - Fourth
+  - Fifth
+  - Finished
   layers:
   - Default
   - TransparentFX
@@ -47,6 +54,15 @@ TagManager:
   - name: Track
     uniqueID: 1234516113
     locked: 0
-  - name: Player
+  - name: Player1
     uniqueID: 1907650697
+    locked: 0
+  - name: Player2
+    uniqueID: 2755228825
+    locked: 0
+  - name: Player3
+    uniqueID: 1043307357
+    locked: 0
+  - name: Player4
+    uniqueID: 3513950277
     locked: 0
