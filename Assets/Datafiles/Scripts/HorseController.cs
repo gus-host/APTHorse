@@ -148,8 +148,6 @@ public class HorseController : MonoBehaviour
         }
     }
 
-
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
         /*        if (tagToBoolMap.TryGetValue(collision.gameObject.tag, out int boolParameter))
