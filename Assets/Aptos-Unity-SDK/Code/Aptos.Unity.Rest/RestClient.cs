@@ -891,7 +891,7 @@ namespace Aptos.Unity.Rest
         /// <param name="callback">Callback function used after response is received.</param>
         /// <param name="viewRequest">The payload for the view function</param>
         /// <returns>A vec containing the values returned from the view functions.</returns>
-        public IEnumerator View(Action<String[], ResponseInfo> callback, ViewRequest viewRequest)
+        public IEnumerator View(Action<string, ResponseInfo> callback, ViewRequest viewRequest)
         {
             var viewURL = Endpoint + "/view";
             var viewURI = new Uri(viewURL);
@@ -917,10 +917,9 @@ namespace Aptos.Unity.Rest
             else // 200
             {
                 var response = viewWebRequest.downloadHandler.text;
-                var values = JsonConvert.DeserializeObject<String[]>(response);
                 responseInfo.status = ResponseInfo.Status.Success;
                 responseInfo.message = response;
-                callback(values, responseInfo);
+                callback(response, responseInfo);
             }
 
             viewWebRequest.Dispose();
@@ -980,6 +979,7 @@ namespace Aptos.Unity.Rest
             }, txnRequestJson));
             yield return cor_encodedSubmission;
 
+            Debug.Log(encodedSubmission.Trim('"')[2..]);
             byte[] toSign = StringToByteArray(encodedSubmission.Trim('"')[2..]);
 
             ///////////////////////////////////////////////////////////////////////

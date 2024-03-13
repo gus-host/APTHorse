@@ -26,7 +26,7 @@ namespace Aptos.Unity.Sample.UI
         public event Action<float> onGetBalance;
 
         private Wallet wallet;
-        private string faucetEndpoint = "https://faucet.devnet.aptoslabs.com";
+        private string faucetEndpoint = "https://faucet.random.aptoslabs.com";
 
         private void Awake()
         {

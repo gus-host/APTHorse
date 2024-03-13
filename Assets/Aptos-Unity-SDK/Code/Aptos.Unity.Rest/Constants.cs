@@ -8,6 +8,7 @@ namespace Aptos.Unity.Rest
         public const string MAINNET_BASE_URL = "https://fullnode.mainnet.aptoslabs.com/v1";
         public const string TESTNET_BASE_URL = "https://fullnode.testnet.aptoslabs.com/v1";
         public const string DEVNET_BASE_URL = "https://fullnode.devnet.aptoslabs.com/v1";
+        public const string RANDOMNET_BASE_URL = "https://fullnode.random.aptoslabs.com/v1";
 
         public const string APTOS_COIN_TYPE = "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>";
 
