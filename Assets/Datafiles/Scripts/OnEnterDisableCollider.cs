@@ -4,7 +4,10 @@ public class OnEnterDisableCollider : MonoBehaviour
 {
    public GameObject _object;
    public GameObject []_objects;
+   public Transform []_nextCheckpoint;
    public bool _turnOnOrOff=false;
+
+    public int checkpointIndex = 0;
 
    private void OnTriggerEnter(Collider other)
    {
@@ -61,4 +64,11 @@ public class OnEnterDisableCollider : MonoBehaviour
            this.gameObject.SetActive(false);
        }
    }
+    public void UpdateCheckPoint()
+    {
+        if(checkpointIndex < _nextCheckpoint.Length )
+        {
+            transform.position = _nextCheckpoint[checkpointIndex++].transform.localPosition;
+        }
+    }
 }

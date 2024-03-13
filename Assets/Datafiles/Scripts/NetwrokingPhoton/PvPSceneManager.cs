@@ -25,18 +25,19 @@ public class PvPSceneManager : MonoBehaviourPunCallbacks
         UnityEngine.SceneManagement.SceneManager.LoadScene("Lobby");
     }
 
-    public override void OnPlayerLeftRoom(Player otherPlayer)
-    {
-        StartCoroutine(ShowToastCoroutine(otherPlayer, false));
-    }
-
-    public override void OnPlayerEnteredRoom(Player newPlayer)
+    public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
     {
         base.OnPlayerEnteredRoom(newPlayer);
         StartCoroutine(ShowToastCoroutine(newPlayer, true));
     }
 
-    IEnumerator ShowToastCoroutine(Player player, bool val)
+    public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
+    {
+        base.OnPlayerLeftRoom(otherPlayer);
+        StartCoroutine(ShowToastCoroutine(otherPlayer, false));
+    }
+
+    IEnumerator ShowToastCoroutine(Photon.Realtime.Player player, bool val)
     {
         // Set the toast message
         var toastText = Instantiate(toastTextPrefab.gameObject, content.transform);

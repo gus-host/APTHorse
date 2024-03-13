@@ -40,7 +40,7 @@ public class PvPPhotonLobbyManager : MonoBehaviourPunCallbacks
 
    public override void OnJoinedRoom()
    {
-      PhotonNetwork.LoadLevel("World");
+      PhotonNetwork.LoadLevel("HorseJockey");
       //UpdatePlayerRoomList();
    }
     public override void OnRoomListUpdate(List<RoomInfo> roomList)

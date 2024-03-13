@@ -5,7 +5,10 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/SampleScene.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Datafiles/Scenes/Lobby.unity
+    guid: 0931e95a58a08e24db639ee88d9d357e
+  - enabled: 1
+    path: Assets/Datafiles/Scenes/HorseJockey.unity
+    guid: 0c7981e50b297054fa6daf8354385f61
   m_configObjects: {}

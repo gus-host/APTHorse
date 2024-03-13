@@ -11,6 +11,7 @@ TagManager:
   - Fourth
   - Fifth
   - Finished
+  - StartPoint
   layers:
   - Default
   - TransparentFX
@@ -54,15 +55,9 @@ TagManager:
   - name: Track
     uniqueID: 1234516113
     locked: 0
-  - name: Player1
+  - name: Checkpoints
+    uniqueID: 349471195
+    locked: 0
+  - name: Player
     uniqueID: 1907650697
-    locked: 0
-  - name: Player2
-    uniqueID: 2755228825
-    locked: 0
-  - name: Player3
-    uniqueID: 1043307357
-    locked: 0
-  - name: Player4
-    uniqueID: 3513950277
     locked: 0

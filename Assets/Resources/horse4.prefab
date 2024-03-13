@@ -11,15 +11,19 @@ GameObject:
   - component: {fileID: 2076364139952552261}
   - component: {fileID: 2007396681612400687}
   - component: {fileID: 7734604272160221349}
-  - component: {fileID: 5681810483419648720}
+  - component: {fileID: 3877556789785043076}
+  - component: {fileID: 4932456812780827095}
   - component: {fileID: 2421441561329153413}
+  - component: {fileID: 1013967353156869935}
+  - component: {fileID: -6951861002347855347}
+  - component: {fileID: -1621279859831175292}
   m_Layer: 0
   m_Name: horse4
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2076364139952552261
 Transform:
   m_ObjectHideFlags: 0
@@ -74,7 +78,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1907650697
-  m_SortingLayer: 3
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: -826863933, guid: f7f1ce929f0f2634da1c3a25a7f6955c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -108,8 +112,35 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!61 &5681810483419648720
-BoxCollider2D:
+--- !u!50 &3877556789785043076
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6924893002060125106}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!58 &4932456812780827095
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -137,22 +168,12 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2.59375, y: 1.71875}
-    newSize: {x: 0.8125, y: 1.84375}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 2.59375, y: 1.71875}
-  m_EdgeRadius: 0
+  m_Radius: 0.4
 --- !u!114 &2421441561329153413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -165,10 +186,116 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f65f4f10a1513c742b9d4848fe218ee0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerProperties:
+    color: 3
+    id: 4
+  raceManager: {fileID: 0}
   waypoints: {fileID: 0}
+  animator: {fileID: 7734604272160221349}
+  spriteRenderer: {fileID: 2007396681612400687}
+  _up: {fileID: -2074315899, guid: f7f1ce929f0f2634da1c3a25a7f6955c, type: 3}
+  _down: {fileID: -144289392, guid: f7f1ce929f0f2634da1c3a25a7f6955c, type: 3}
+  _forward: {fileID: -826863933, guid: f7f1ce929f0f2634da1c3a25a7f6955c, type: 3}
+  _backward: {fileID: -990746587, guid: f7f1ce929f0f2634da1c3a25a7f6955c, type: 3}
+  index: 0
+  horseId: 0
+  totalLap: 1
+  lapLeft: 1
   _maxSpeed: 5
   _minSpeed: 2
   _acceleration: 0.1
   currentSpeed: 0
   _target: {fileID: 0}
   _canMove: 1
+  _running: 0
+  _raceFinished: 0
+  _lastLap: 0
+  _gameEnded: 0
+  _InForwardRange: 0
+  _InBackwardRange: 0
+  _InUpRange: 0
+  _InDownRange: 0
+--- !u!114 &1013967353156869935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6924893002060125106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents:
+  - {fileID: -6951861002347855347}
+  - {fileID: -1621279859831175292}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
+--- !u!114 &-6951861002347855347
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6924893002060125106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8efc6b1d64977384eb3405357896c656, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PositionModel:
+    SynchronizeEnabled: 0
+    TeleportEnabled: 1
+    TeleportIfDistanceGreaterThan: 3
+    InterpolateOption: 2
+    InterpolateMoveTowardsSpeed: 1
+    InterpolateLerpSpeed: 1
+    ExtrapolateOption: 0
+    ExtrapolateSpeed: 1
+    ExtrapolateIncludingRoundTripTime: 1
+    ExtrapolateNumberOfStoredPositions: 1
+  m_RotationModel:
+    SynchronizeEnabled: 0
+    InterpolateOption: 1
+    InterpolateRotateTowardsSpeed: 180
+    InterpolateLerpSpeed: 5
+  m_ScaleModel:
+    SynchronizeEnabled: 0
+    InterpolateOption: 0
+    InterpolateMoveTowardsSpeed: 1
+    InterpolateLerpSpeed: 0
+--- !u!114 &-1621279859831175292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6924893002060125106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowLayerWeightsInspector: 1
+  ShowParameterInspector: 1
+  m_SynchronizeParameters:
+  - Type: 4
+    SynchronizeType: 0
+    Name: RunDown
+  - Type: 4
+    SynchronizeType: 0
+    Name: RunUp
+  - Type: 4
+    SynchronizeType: 0
+    Name: RunStraight
+  m_SynchronizeLayers:
+  - SynchronizeType: 0
+    LayerIndex: 0
