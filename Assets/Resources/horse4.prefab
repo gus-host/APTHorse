@@ -215,6 +215,7 @@ MonoBehaviour:
   _InBackwardRange: 0
   _InUpRange: 0
   _InDownRange: 0
+  lapReductionProcessed: 0
 --- !u!114 &1013967353156869935
 MonoBehaviour:
   m_ObjectHideFlags: 0

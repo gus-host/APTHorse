@@ -86,7 +86,7 @@ public class RaceManager : MonoBehaviourPunCallbacks
         {
             for (int i = 0; i< jockeys.Length; i++)
             {
-                photonView.RPC("SyncJockeyValues", RpcTarget.All,i , jockeys[i]._maxSpeed, jockeys[i]._minSpeed, jockeys[i]._acceleration, jockeys[i].totalLap);
+                photonView.RPC("SyncJockeyValues", RpcTarget.All,i , jockeys[i]._maxSpeed, jockeys[i]._minSpeed, jockeys[i]._acceleration, jockeys[i].totalLap, jockeys[i].lapLeft, jockeys[i]._lastLap);
             }
             // Synchronize random values with other clients
         }
@@ -103,15 +103,24 @@ public class RaceManager : MonoBehaviourPunCallbacks
             jockey._acceleration = UnityEngine.Random.Range(0.1f, 1.1f);
             jockey.totalLap = totalLap;
             jockey.lapLeft = totalLap;
+            if(totalLap == 1)
+            {
+                jockey._lastLap = true;
+            }
         }
     }
     [PunRPC]
-    private void SyncJockeyValues(int jockeyIndex, float maxSpeed, float minSpeed, float acceleration, int totalLap)
+    private void SyncJockeyValues(int jockeyIndex, float maxSpeed, float minSpeed, float acceleration, int totalLap, int lapLeft, bool lastLap)
     {
         jockeys[jockeyIndex]._maxSpeed = maxSpeed;
         jockeys[jockeyIndex]._minSpeed = minSpeed;
         jockeys[jockeyIndex]._acceleration = acceleration;
         jockeys[jockeyIndex].totalLap = totalLap;
+        jockeys[jockeyIndex].lapLeft = lapLeft;
+        if (totalLap == 1)
+        {
+            jockeys[jockeyIndex]._lastLap = lastLap;
+        }
         jockeys[jockeyIndex].StartRace();
     }
 

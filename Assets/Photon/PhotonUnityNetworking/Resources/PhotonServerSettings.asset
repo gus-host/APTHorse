@@ -55,6 +55,8 @@ MonoBehaviour:
   - SyncJockeyValues
   - RPCReduceLapandUpdateCheckpoint
   - SetLastLap
+  - SetLapReductionProcessed
+  - RPCDelayLapReductionProcessed
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

@@ -58,7 +58,7 @@ public class HorseController : MonoBehaviourPunCallbacks
     public bool _InBackwardRange;
     public bool _InUpRange;
     public bool _InDownRange;
-    bool lapReductionProcessed = false;
+    public bool lapReductionProcessed = false;
 
     float accelerationInput = 0f;
 
@@ -351,8 +351,15 @@ public class HorseController : MonoBehaviourPunCallbacks
 
     public void ReduceLapandUpdateCheckpoint(OnEnterDisableCollider onEnterDisableCollider)
     {
-        photonView.RPC("RPCReduceLapandUpdateCheckpoint", RpcTarget.AllBuffered);
-        if (_lastLap)
+        if (!_lastLap)
+        {
+            photonView.RPC("RPCReduceLapandUpdateCheckpoint", RpcTarget.AllBuffered);
+            if (onEnterDisableCollider._nextCheckpoint.Length > 0)
+            {
+                onEnterDisableCollider.UpdateCheckPoint();
+            }
+        }
+        else if (_lastLap)
         {
             Debug.LogError("Completed Race");
             spriteRenderer.flipX = false;
@@ -400,38 +407,71 @@ public class HorseController : MonoBehaviourPunCallbacks
                 animator.SetBool(RunDownHash, false);
             }
         }
-        else if (onEnterDisableCollider._nextCheckpoint.Length > 0 && totalLap > 0)
-        {
-            onEnterDisableCollider.UpdateCheckPoint();
-        }
     }
+    /*
+        [PunRPC]
+        public void RPCReduceLapandUpdateCheckpoint()
+        {
+            if (!lapReductionProcessed)
+            {
+                ReduceLapandCheckForLastLap();
+                lapReductionProcessed = true;
+            }
+        }
+
+        private void ReduceLapandCheckForLastLap()
+        {
+            lapLeft--;
+            lapReductionProcessed = false;
+            if (lapLeft == 1)
+            {
+                photonView.RPC("SetLastLap", RpcTarget.All, true);
+            }
+        }
+
+        [PunRPC]
+        private void SetLastLap(bool lastLap)
+        {
+            StartCoroutine(DelayLastLap(lastLap));
+        }*/
 
     [PunRPC]
     public void RPCReduceLapandUpdateCheckpoint()
     {
-        if (!lapReductionProcessed)
-        {
-            ReduceLapandCheckForLastLap();
-            lapReductionProcessed = true;
-        }
+        ReduceLapandCheckForLastLap();
     }
 
     private void ReduceLapandCheckForLastLap()
     {
-        lapLeft--;
-        lapReductionProcessed = false;
-        if (lapLeft == 1)
+        if(!lapReductionProcessed)
         {
-            photonView.RPC("SetLastLap", RpcTarget.All, true);
+            lapLeft--;
+            lapReductionProcessed = true;
+        }
+        photonView.RPC("SetLapReductionProcessed", RpcTarget.AllBuffered, true);
+        photonView.RPC("RPCDelayLapReductionProcessed", RpcTarget.AllBuffered, true);
+    }
+
+    [PunRPC]
+    private void SetLapReductionProcessed(bool processed)
+    {
+        if (processed && lapLeft == 1)
+        {
+            StartCoroutine(DelayLastLap(true));
         }
     }
 
     [PunRPC]
-    private void SetLastLap(bool lastLap)
+    private void RPCDelayLapReductionProcessed(bool processed)
     {
-        StartCoroutine(DelayLastLap(lastLap));
+           StartCoroutine(DelayLapReductionProcessed(processed));
     }
 
+    private IEnumerator DelayLapReductionProcessed(bool lastLap)
+    {
+        yield return new WaitForSeconds(1.5f);
+        lapReductionProcessed = !lastLap;
+    }
     private IEnumerator DelayLastLap(bool lastLap)
     {
         yield return new WaitForSeconds(1.5f);
