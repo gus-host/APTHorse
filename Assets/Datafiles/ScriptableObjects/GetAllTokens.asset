@@ -1,0 +1,177 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ccf793b7ca1cc645b9cd36d753b8e3c, type: 3}
+  m_Name: GetAllTokens
+  m_EditorClassIdentifier: 
+  url: https://indexer-randomnet.hasura.app/v1/graphql
+  queries:
+  - name: GetAllTokens
+    type: 0
+    query: "query GetAllTokens{\n    current_token_ownerships_v2(  where :{ owner_address
+      :\"0x125133f7562b14bc38e2553956246cacc6170d47875945231138cdba93916251\"} ){\n       
+      token_data_id\n    }\n}"
+    queryString: current_token_ownerships_v2
+    returnType: current_token_ownerships_v2
+    queryOptions:
+    - account_transactions
+    - account_transactions_aggregate
+    - account_transactions_by_pk
+    - address_events_summary
+    - address_version_from_events
+    - address_version_from_events_aggregate
+    - address_version_from_move_resources
+    - address_version_from_move_resources_aggregate
+    - block_metadata_transactions
+    - block_metadata_transactions_by_pk
+    - coin_activities
+    - coin_activities_aggregate
+    - coin_activities_by_pk
+    - coin_balances
+    - coin_balances_by_pk
+    - coin_infos
+    - coin_infos_by_pk
+    - coin_supply
+    - coin_supply_by_pk
+    - collection_datas
+    - collection_datas_by_pk
+    - current_ans_lookup
+    - current_ans_lookup_by_pk
+    - current_aptos_names
+    - current_coin_balances
+    - current_coin_balances_by_pk
+    - current_collection_datas
+    - current_collection_datas_by_pk
+    - current_collection_ownership_v2_view
+    - current_collection_ownership_v2_view_aggregate
+    - current_collections_v2
+    - current_collections_v2_by_pk
+    - current_delegated_staking_pool_balances
+    - current_delegated_staking_pool_balances_by_pk
+    - current_delegated_voter
+    - current_delegated_voter_by_pk
+    - current_delegator_balances
+    - current_delegator_balances_by_pk
+    - current_fungible_asset_balances
+    - current_fungible_asset_balances_aggregate
+    - current_fungible_asset_balances_by_pk
+    - current_objects
+    - current_objects_by_pk
+    - current_staking_pool_voter
+    - current_staking_pool_voter_by_pk
+    - current_table_items
+    - current_table_items_by_pk
+    - current_token_datas
+    - current_token_datas_by_pk
+    - current_token_datas_v2
+    - current_token_datas_v2_by_pk
+    - current_token_ownerships
+    - current_token_ownerships_aggregate
+    - current_token_ownerships_by_pk
+    - current_token_ownerships_v2
+    - current_token_ownerships_v2_aggregate
+    - current_token_ownerships_v2_by_pk
+    - current_token_pending_claims
+    - current_token_pending_claims_by_pk
+    - delegated_staking_activities
+    - delegated_staking_activities_by_pk
+    - delegated_staking_pools
+    - delegated_staking_pools_by_pk
+    - delegator_distinct_pool
+    - delegator_distinct_pool_aggregate
+    - events
+    - events_by_pk
+    - fungible_asset_activities
+    - fungible_asset_activities_by_pk
+    - fungible_asset_metadata
+    - fungible_asset_metadata_by_pk
+    - indexer_status
+    - indexer_status_by_pk
+    - ledger_infos
+    - ledger_infos_by_pk
+    - move_resources
+    - move_resources_aggregate
+    - nft_marketplace_v2_current_nft_marketplace_auctions
+    - nft_marketplace_v2_current_nft_marketplace_auctions_by_pk
+    - nft_marketplace_v2_current_nft_marketplace_collection_offers
+    - nft_marketplace_v2_current_nft_marketplace_collection_offers_by_pk
+    - nft_marketplace_v2_current_nft_marketplace_listings
+    - nft_marketplace_v2_current_nft_marketplace_listings_by_pk
+    - nft_marketplace_v2_current_nft_marketplace_token_offers
+    - nft_marketplace_v2_current_nft_marketplace_token_offers_by_pk
+    - nft_marketplace_v2_nft_marketplace_activities
+    - nft_marketplace_v2_nft_marketplace_activities_by_pk
+    - num_active_delegator_per_pool
+    - processor_status
+    - processor_status_by_pk
+    - proposal_votes
+    - proposal_votes_aggregate
+    - proposal_votes_by_pk
+    - table_items
+    - table_items_by_pk
+    - table_metadatas
+    - table_metadatas_by_pk
+    - token_activities
+    - token_activities_aggregate
+    - token_activities_by_pk
+    - token_activities_v2
+    - token_activities_v2_aggregate
+    - token_activities_v2_by_pk
+    - token_datas
+    - token_datas_by_pk
+    - token_ownerships
+    - token_ownerships_by_pk
+    - tokens
+    - tokens_by_pk
+    - user_transactions
+    - user_transactions_by_pk
+    fields:
+    - index: 12
+      name: token_data_id
+      type: String
+      parentIndexes: 
+      hasSubField: 0
+      possibleFields:
+      - name: amount
+        type: numeric
+      - name: composed_nfts
+        type: current_token_ownerships_v2
+      - name: composed_nfts_aggregate
+        type: current_token_ownerships_v2_aggregate
+      - name: current_token_data
+        type: current_token_datas_v2
+      - name: is_fungible_v2
+        type: Boolean
+      - name: is_soulbound_v2
+        type: Boolean
+      - name: last_transaction_timestamp
+        type: timestamp
+      - name: last_transaction_version
+        type: bigint
+      - name: owner_address
+        type: String
+      - name: property_version_v1
+        type: numeric
+      - name: storage_id
+        type: String
+      - name: table_type_v1
+        type: String
+      - name: token_data_id
+        type: String
+      - name: token_properties_mutated_v1
+        type: jsonb
+      - name: token_standard
+        type: String
+      hasChanged: 0
+    isComplete: 1
+  mutations: []
+  subscriptions: []
+  loading: 0

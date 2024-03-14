@@ -100,7 +100,7 @@ namespace Aptos.Unity.Sample
             viewRequest.Arguments = new string[] { bobAddress.ToString() };
             Coroutine getBobAccountBalanceView = StartCoroutine(RestClient.Instance.View((_data, _responseInfo) =>
             {
-                data = _data;
+                data = JsonConvert.DeserializeObject<string[]>(_data);
                 responseInfo = _responseInfo;
             }, viewRequest));
             yield return getBobAccountBalanceView;
