@@ -41,7 +41,6 @@ public class RaceManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-
         #region Go through each jockey and assign the properties
         /* foreach (var jockey in jockeys)
          {
@@ -73,24 +72,8 @@ public class RaceManager : MonoBehaviourPunCallbacks
         _start.onClick.AddListener(() =>
         {
             photonView.RPC("StartRace", RpcTarget.AllBuffered);
-            //StartRace();
         });
     }
-
-/*    [PunRPC]
-    private void StartRace()
-    {
-        foreach (var jockey in jockeys)
-        {
-            jockey._maxSpeed = UnityEngine.Random.Range(4, 6);
-            jockey._minSpeed = UnityEngine.Random.Range(1, 2);
-            jockey._acceleration = UnityEngine.Random.Range(0.1f, 1.1f);
-            jockey.totalLap = totalLap;
-            jockey.StartRace();
-        }
-        CallDisableBetPanelRPC();
-        //BetPanel.gameObject.SetActive(false);
-    }*/
 
     [PunRPC]
     private void StartRace()
