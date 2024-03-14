@@ -840,6 +840,7 @@ MonoBehaviour:
   AptosUsername: {fileID: 516433789}
   APTBalance: 0
   Username: 
+  EquippedHorseId: 1000
 --- !u!4 &227476187
 Transform:
   m_ObjectHideFlags: 0
@@ -5075,6 +5076,7 @@ MonoBehaviour:
   - {fileID: -826863933, guid: f7f1ce929f0f2634da1c3a25a7f6955c, type: 3}
   - {fileID: 364486861, guid: a3a42fcc149104643ad737f62d13bc55, type: 3}
   - {fileID: 1813908782, guid: a16a13eea67ec1b4e8eda29431fed40a, type: 3}
+  - {fileID: 2001957834, guid: 4c2d54a3fdbe4d64692adb5496449343, type: 3}
   ownedHorsesNames: []
   getAllTokensGraphQL: {fileID: 11400000, guid: c3fcf107570919a24985212c2149af51, type: 2}
 --- !u!114 &1934181122

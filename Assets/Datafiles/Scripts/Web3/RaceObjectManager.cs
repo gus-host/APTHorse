@@ -15,7 +15,7 @@ public class RaceObjectManager : MonoBehaviour
 
         ViewRequest viewRequest = new()
         {
-            Function = "0xa94a9da70feb4596757bce720b8b612c9ef54783f84316f7cb5523b5eb4e47d7::aptos_horses_game::get_all_races_metadata",
+            Function = "0xdafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead::aptos_horses_game::get_all_races_metadata",
             TypeArguments = new string[] { },
             Arguments = new string[] { }
         };

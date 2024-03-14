@@ -1,8 +1,24 @@
+using System.Collections.Generic;
 using Aptos.HdWallet;
 using Aptos.Unity.Rest;
 using Aptos.Unity.Sample.UI;
 using TMPro;
 using UnityEngine;
+
+public struct JoinedRaceInfo
+{
+    public string playerAddress;
+    public string playerName;
+    public int horseId;
+    public int horseSpeed;
+}
+
+struct RacePlayer
+{
+    public JoinedRaceInfo joinedRaceInfo;
+    public float acceleration;
+    public List<float> hurdles;
+}
 
 public class WalletManager : MonoBehaviour
 {
@@ -15,7 +31,9 @@ public class WalletManager : MonoBehaviour
     [HideInInspector] public Wallet Wallet = null;
     [HideInInspector] public float APTBalance;
     [HideInInspector] public string Username = "";
+    [HideInInspector] public string Address = "";
     [HideInInspector] public int EquippedHorseId = 1000;
+    [HideInInspector] public Dictionary<int, JoinedRaceInfo> joinedRaceInfos = new();
 
     void Awake()
     {
@@ -53,7 +71,8 @@ public class WalletManager : MonoBehaviour
         else if (!AptosUILink.Instance.RestoreWallet(mneomicsKey)) return false;
 
         Wallet = new Wallet(mneomicsKey);
-        AptosAddress.text = $"Address : {AptosUILink.Instance.GetCurrentWalletAddress()}";
+        Address = AptosUILink.Instance.GetCurrentWalletAddress();
+        AptosAddress.text = $"Address : {Address}";
 
         return true;
     }
