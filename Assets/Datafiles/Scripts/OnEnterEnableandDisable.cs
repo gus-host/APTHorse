@@ -1,12 +1,18 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class OnEnterEnableandDisable : MonoBehaviour
+public class OnEnterEnableandDisable : MonoBehaviour, IPunObservable
 {
     public GameObject _obj;
     public GameObject []_objts;
     public bool _enabled;
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        throw new System.NotImplementedException();
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

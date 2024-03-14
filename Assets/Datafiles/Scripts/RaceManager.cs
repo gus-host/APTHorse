@@ -125,14 +125,6 @@ public class RaceManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void SyncJockeyValues(int jockeyIndex, float maxSpeed, float minSpeed, float acceleration, int totalLap)
     {
-        /*        foreach (var jockey in jockeys)
-                {
-                    jockey._maxSpeed = maxSpeed;
-                    jockey._minSpeed = minSpeed;
-                    jockey._acceleration = acceleration;
-                    jockey.totalLap = totalLap;
-                    jockey.StartRace();
-                }*/
         jockeys[jockeyIndex]._maxSpeed = maxSpeed;
         jockeys[jockeyIndex]._minSpeed = minSpeed;
         jockeys[jockeyIndex]._acceleration = acceleration;

@@ -234,11 +234,6 @@ public class HorseController : MonoBehaviourPunCallbacks
         }
     }
 
-    private void DelayLastLap()
-    {
-        _lastLap = true;
-    }
-
     private void Update()
     {
         if(_raceFinished && !_gameEnded)
@@ -265,6 +260,7 @@ public class HorseController : MonoBehaviourPunCallbacks
     private void OnTriggerEnter2D(Collider2D collision)
     {
 
+        #region Change animation on trigger
         Debug.Log($"Collision {collision.gameObject.tag}");
         if (collision.gameObject.CompareTag("Start"))
         {
@@ -343,66 +339,97 @@ public class HorseController : MonoBehaviourPunCallbacks
             _InForwardRange = true;
             _InUpRange = false;
         }
+        #endregion
+        // Reduce lap and check for game finished
         else if (collision.gameObject.TryGetComponent<OnEnterDisableCollider>(out OnEnterDisableCollider onEnterDisableCollider)
             && collision.gameObject.CompareTag("Finished"))
         {
-            lapLeft--;
-            if(lapLeft == 1)
+            ReduceLapandUpdateCheckpoint(onEnterDisableCollider);
+        }
+    }
+
+    public void ReduceLapandUpdateCheckpoint(OnEnterDisableCollider onEnterDisableCollider)
+    {
+        photonView.RPC("RPCReduceLapandUpdateCheckpoint", RpcTarget.AllBuffered);
+        if (totalLap == 1 && _lastLap)
+        {
+            Debug.LogError("Completed Race");
+            spriteRenderer.flipX = false;
+            _canMove = false;
+            _running = false;
+            _raceFinished = true;
+            if (_InForwardRange)
             {
-                Invoke("DelayLastLap", 1.5f);
+                animator.SetBool(IdleForwardHash, true);
+                animator.SetBool(IdleUpHash, false);
+                animator.SetBool(IdleDownHash, false);
+                animator.SetBool(IdleBackwardHash, false);
+                animator.SetBool(RunStraight, false);
+                animator.SetBool(RunUpHash, false);
+                animator.SetBool(RunDownHash, false);
             }
-            if (totalLap == 1 && _lastLap)
+            else if (_InUpRange)
             {
-                Debug.LogError("Completed Race");
-                spriteRenderer.flipX = false;
-                _canMove = false;
-                _running = false;
-                _raceFinished = true;
-                if (_InForwardRange)
-                {
-                    animator.SetBool(IdleForwardHash, true);
-                    animator.SetBool(IdleUpHash, false);
-                    animator.SetBool(IdleDownHash, false);
-                    animator.SetBool(IdleBackwardHash, false);
-                    animator.SetBool(RunStraight, false);
-                    animator.SetBool(RunUpHash, false);
-                    animator.SetBool(RunDownHash, false);
-                }
-                else if (_InUpRange)
-                {
-                    animator.SetBool(IdleUpHash, true);
-                    animator.SetBool(IdleForwardHash, false);
-                    animator.SetBool(IdleDownHash, false);
-                    animator.SetBool(IdleBackwardHash, false);
-                    animator.SetBool(RunStraight, false);
-                    animator.SetBool(RunUpHash, false);
-                    animator.SetBool(RunDownHash, false);
-                }
-                else if(_InDownRange)
-                {
-                    animator.SetBool(IdleDownHash, true);
-                    animator.SetBool(IdleForwardHash, false);
-                    animator.SetBool(IdleUpHash, false);
-                    animator.SetBool(IdleBackwardHash, false);
-                    animator.SetBool(RunStraight, false);
-                    animator.SetBool(RunUpHash, false);
-                    animator.SetBool(RunDownHash, false);
-                }
-                else if (_InBackwardRange)
-                {
-                    animator.SetBool(IdleBackwardHash, true);
-                    animator.SetBool(IdleForwardHash, false);
-                    animator.SetBool(IdleUpHash, false);
-                    animator.SetBool(IdleDownHash, false);
-                    animator.SetBool(RunStraight, false);
-                    animator.SetBool(RunUpHash, false);
-                    animator.SetBool(RunDownHash, false);
-                }
+                animator.SetBool(IdleUpHash, true);
+                animator.SetBool(IdleForwardHash, false);
+                animator.SetBool(IdleDownHash, false);
+                animator.SetBool(IdleBackwardHash, false);
+                animator.SetBool(RunStraight, false);
+                animator.SetBool(RunUpHash, false);
+                animator.SetBool(RunDownHash, false);
             }
-            else if (onEnterDisableCollider._nextCheckpoint.Length > 0 && totalLap>0)
+            else if (_InDownRange)
             {
-                onEnterDisableCollider.UpdateCheckPoint();
+                animator.SetBool(IdleDownHash, true);
+                animator.SetBool(IdleForwardHash, false);
+                animator.SetBool(IdleUpHash, false);
+                animator.SetBool(IdleBackwardHash, false);
+                animator.SetBool(RunStraight, false);
+                animator.SetBool(RunUpHash, false);
+                animator.SetBool(RunDownHash, false);
+            }
+            else if (_InBackwardRange)
+            {
+                animator.SetBool(IdleBackwardHash, true);
+                animator.SetBool(IdleForwardHash, false);
+                animator.SetBool(IdleUpHash, false);
+                animator.SetBool(IdleDownHash, false);
+                animator.SetBool(RunStraight, false);
+                animator.SetBool(RunUpHash, false);
+                animator.SetBool(RunDownHash, false);
             }
         }
+        else if (onEnterDisableCollider._nextCheckpoint.Length > 0 && totalLap > 0)
+        {
+            onEnterDisableCollider.UpdateCheckPoint();
+        }
+    }
+
+
+    [PunRPC]
+    public void RPCReduceLapandUpdateCheckpoint()
+    {
+        ReduceLapandCheckForLastLap();
+    }
+
+    private void ReduceLapandCheckForLastLap()
+    {
+        lapLeft--;
+        if (lapLeft == 1)
+        {
+            photonView.RPC("SetLastLap", RpcTarget.All, true);
+        }
+    }
+
+    [PunRPC]
+    private void SetLastLap(bool lastLap)
+    {
+        StartCoroutine(DelayLastLap(lastLap));
+    }
+
+    private IEnumerator DelayLastLap(bool lastLap)
+    {
+        yield return new WaitForSeconds(1.5f);
+        _lastLap = lastLap;
     }
 }

@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: 1907650697
   m_SortingLayer: 4
   m_SortingOrder: 0
-  m_Sprite: {fileID: -826863933, guid: f7f1ce929f0f2634da1c3a25a7f6955c, type: 3}
+  m_Sprite: {fileID: 2001957834, guid: 4c2d54a3fdbe4d64692adb5496449343, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -101,7 +101,7 @@ Animator:
   m_GameObject: {fileID: 6199159330382274366}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 4024f91202e83a142b42e05070639fd8, type: 2}
+  m_Controller: {fileID: 9100000, guid: ed5cbf02950ff8948a20e06bf93af1fa, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -193,10 +193,10 @@ MonoBehaviour:
   waypoints: {fileID: 0}
   animator: {fileID: 4000896609482998693}
   spriteRenderer: {fileID: 0}
-  _up: {fileID: -1040499011, guid: f7f1ce929f0f2634da1c3a25a7f6955c, type: 3}
-  _down: {fileID: -144289392, guid: f7f1ce929f0f2634da1c3a25a7f6955c, type: 3}
-  _forward: {fileID: -826863933, guid: f7f1ce929f0f2634da1c3a25a7f6955c, type: 3}
-  _backward: {fileID: -990746587, guid: f7f1ce929f0f2634da1c3a25a7f6955c, type: 3}
+  _up: {fileID: -2077931341, guid: 4c2d54a3fdbe4d64692adb5496449343, type: 3}
+  _down: {fileID: 1212386888, guid: 4c2d54a3fdbe4d64692adb5496449343, type: 3}
+  _forward: {fileID: 2001957834, guid: 4c2d54a3fdbe4d64692adb5496449343, type: 3}
+  _backward: {fileID: -1001219347, guid: 4c2d54a3fdbe4d64692adb5496449343, type: 3}
   index: 0
   horseId: 0
   totalLap: 1
@@ -296,6 +296,18 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 0
     Name: RunStraight
+  - Type: 4
+    SynchronizeType: 0
+    Name: IdleStraight
+  - Type: 4
+    SynchronizeType: 0
+    Name: IdleDown
+  - Type: 4
+    SynchronizeType: 0
+    Name: IdleBack
+  - Type: 4
+    SynchronizeType: 0
+    Name: IdleUp
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0

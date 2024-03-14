@@ -1,6 +1,7 @@
+using Photon.Pun;
 using UnityEngine;
 
-public class OnEnterDisableCollider : MonoBehaviour
+public class OnEnterDisableCollider : MonoBehaviourPunCallbacks, IPunObservable
 {
    public GameObject _object;
    public GameObject []_objects;
@@ -69,6 +70,22 @@ public class OnEnterDisableCollider : MonoBehaviour
         if(checkpointIndex < _nextCheckpoint.Length )
         {
             transform.position = _nextCheckpoint[checkpointIndex++].transform.localPosition;
+        }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            // Serialize fields to send over the network
+            stream.SendNext(_turnOnOrOff);
+            stream.SendNext(checkpointIndex);
+        }
+        else
+        {
+            // Deserialize received data
+            _turnOnOrOff = (bool)stream.ReceiveNext();
+            checkpointIndex = (int)stream.ReceiveNext();
         }
     }
 }
