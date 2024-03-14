@@ -1,10 +1,11 @@
+using Photon.Pun;
 using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RaceManager : MonoBehaviour
+public class RaceManager : MonoBehaviourPunCallbacks
 {
     public float DummyToken = 10f;
 
@@ -22,19 +23,24 @@ public class RaceManager : MonoBehaviour
     public PlayerItem playerItem;
 
 
+    public int jockeyId;
+    public int totalLap;
+    
     public HorseController[] jockeys;
     public List<HorseController> _horseRanks = new List<HorseController>();
     static Action UpdateAtt;
 
     //On which playe has bet
-    public int jockeyId;
-    public int totalLap;
 
     public Stack<HorseController> horses = new Stack<HorseController>();
 
+    private void Awake()
+    {
+       jockeys = new HorseController[5]; 
+    }
+
     private void Start()
     {
-
         #region Go through each jockey and assign the properties
         /* foreach (var jockey in jockeys)
          {
@@ -65,11 +71,30 @@ public class RaceManager : MonoBehaviour
         );
         _start.onClick.AddListener(() =>
         {
-            StartRace();
+            photonView.RPC("StartRace", RpcTarget.AllBuffered);
         });
     }
 
+    [PunRPC]
     private void StartRace()
+    {
+        //Generate random values like minimum speed and acceleration
+        GenerateRandomValues();
+
+        //Assign these values to all other horses across all clients
+        if (PhotonNetwork.IsMasterClient)
+        {
+            for (int i = 0; i< jockeys.Length; i++)
+            {
+                photonView.RPC("SyncJockeyValues", RpcTarget.All,i , jockeys[i]._maxSpeed, jockeys[i]._minSpeed, jockeys[i]._acceleration, jockeys[i].totalLap);
+            }
+            // Synchronize random values with other clients
+        }
+
+        CallDisableBetPanelRPC();
+    }
+
+    private void GenerateRandomValues()
     {
         foreach (var jockey in jockeys)
         {
@@ -77,11 +102,30 @@ public class RaceManager : MonoBehaviour
             jockey._minSpeed = UnityEngine.Random.Range(1, 2);
             jockey._acceleration = UnityEngine.Random.Range(0.1f, 1.1f);
             jockey.totalLap = totalLap;
-            jockey.StartRace();
+            jockey.lapLeft = totalLap;
         }
+    }
+    [PunRPC]
+    private void SyncJockeyValues(int jockeyIndex, float maxSpeed, float minSpeed, float acceleration, int totalLap)
+    {
+        jockeys[jockeyIndex]._maxSpeed = maxSpeed;
+        jockeys[jockeyIndex]._minSpeed = minSpeed;
+        jockeys[jockeyIndex]._acceleration = acceleration;
+        jockeys[jockeyIndex].totalLap = totalLap;
+        jockeys[jockeyIndex].StartRace();
+    }
+
+    [PunRPC]
+    private void DisableBetPanel()
+    {
         BetPanel.gameObject.SetActive(false);
     }
 
+    // Call this method when you want to disable the BetPanel across the network
+    private void CallDisableBetPanelRPC()
+    {
+        photonView.RPC("DisableBetPanel", RpcTarget.All);
+    }
     private void Bet()
     {
         int.TryParse(tMP_InputField_totallap.text, out int totalLapVal);
@@ -120,13 +164,19 @@ public class RaceManager : MonoBehaviour
         UpdateAtt -= UpdateAttributes;
     }
 
+    
+    public void RPCPrintStack()
+    {
+        photonView.RPC("PrintStack", RpcTarget.All);
+    }
+    [PunRPC]
     public void PrintStack()
     {
         foreach(var horse in horses)
         {
             Debug.LogError(horse.playerProperties.color);
         }
-        if (horses.Count>3)
+        if (horses.Count>4)
         {
             ResultPanel.SetActive(true);
             while (horses.Count>0)
