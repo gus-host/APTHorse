@@ -58,6 +58,7 @@ public class HorseController : MonoBehaviourPunCallbacks
     public bool _InBackwardRange;
     public bool _InUpRange;
     public bool _InDownRange;
+    bool lapReductionProcessed = false;
 
     float accelerationInput = 0f;
 
@@ -351,7 +352,7 @@ public class HorseController : MonoBehaviourPunCallbacks
     public void ReduceLapandUpdateCheckpoint(OnEnterDisableCollider onEnterDisableCollider)
     {
         photonView.RPC("RPCReduceLapandUpdateCheckpoint", RpcTarget.AllBuffered);
-        if (totalLap == 1 && _lastLap)
+        if (_lastLap)
         {
             Debug.LogError("Completed Race");
             spriteRenderer.flipX = false;
@@ -405,16 +406,20 @@ public class HorseController : MonoBehaviourPunCallbacks
         }
     }
 
-
     [PunRPC]
     public void RPCReduceLapandUpdateCheckpoint()
     {
-        ReduceLapandCheckForLastLap();
+        if (!lapReductionProcessed)
+        {
+            ReduceLapandCheckForLastLap();
+            lapReductionProcessed = true;
+        }
     }
 
     private void ReduceLapandCheckForLastLap()
     {
         lapLeft--;
+        lapReductionProcessed = false;
         if (lapLeft == 1)
         {
             photonView.RPC("SetLastLap", RpcTarget.All, true);
