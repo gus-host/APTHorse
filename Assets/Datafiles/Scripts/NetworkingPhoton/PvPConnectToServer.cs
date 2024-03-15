@@ -1,10 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Photon.Pun;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class PvPConnectToServer : MonoBehaviourPunCallbacks
@@ -17,28 +13,27 @@ public class PvPConnectToServer : MonoBehaviourPunCallbacks
     
     private void Start()
     {
-        _continue.onClick.AddListener(Connect);
+        //_continue.onClick.AddListener(Connect);
         PhotonNetwork.Disconnect();
+        Connect();
     }
 
     private void Connect()
     {
-        if (!string.IsNullOrEmpty(_playerName.text))
+        string userName = PlayerPrefs.GetString("Username");
+        if (!string.IsNullOrEmpty(userName))
         {
-            Debug.LogError($"Name {_playerName.text}");
-            PhotonNetwork.NickName = _playerName.text;
-            _continuetext.text = "connecting..";
+            PhotonNetwork.NickName = userName;
             PhotonNetwork.ConnectUsingSettings();
         }
         else
         {
-            Debug.LogError($"Empty {_playerName.text}");
+            Debug.LogError($"Empty {userName}");
         }
     }
 
     public override void OnConnectedToMaster()
     {
         _lobbyManager.SetActive(true);
-        _continuetext.text = "starting game";
     }
 }

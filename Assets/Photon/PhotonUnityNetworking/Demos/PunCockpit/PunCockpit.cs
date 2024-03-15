@@ -441,7 +441,7 @@ namespace Photon.Pun.Demo.Cockpit
             this.LobbyPanel.gameObject.SetActive(false);
             this.ConnectingLabel.SetActive(true);
             this.roomNameToEnter = roomName;
-            PhotonNetwork.JoinRoom(roomName);
+            //PhotonNetwork.JoinRoom(roomName);
         }
 
         public void CreateRoom()

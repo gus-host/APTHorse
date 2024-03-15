@@ -20,7 +20,7 @@ namespace Photon.Pun.Demo.Asteroids
                     PhotonNetwork.LeaveLobby();
                 }
 
-                PhotonNetwork.JoinRoom(roomName);
+                //PhotonNetwork.JoinRoom(roomName);
             });
         }
 
