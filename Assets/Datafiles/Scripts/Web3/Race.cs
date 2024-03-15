@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Aptos.Accounts;
@@ -7,14 +6,12 @@ using Aptos.HdWallet.Utils;
 using Aptos.Unity.Rest;
 using Aptos.Unity.Rest.Model;
 using Aptos.Unity.Sample.UI;
-using Photon.Pun;
-using Photon.Realtime;
 using SimpleJSON;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Race : MonoBehaviourPunCallbacks
+public class Race : MonoBehaviour
 {
     public TextMeshProUGUI raceNameText;
     public TextMeshProUGUI racePriceText;
@@ -130,20 +127,6 @@ public class Race : MonoBehaviourPunCallbacks
         AptosUILink.Instance.LoadCurrentWalletBalance();
     }
 
-    private void JoinArena()
-    {
-        Debug.LogError($"JoinArena");
-        Debug.LogError($"Race Id {raceId} && {PhotonNetwork.Server}");
-        RoomOptions roomOptions = new RoomOptions() { MaxPlayers = 5, IsOpen = true, IsVisible = true };
-        PhotonNetwork.JoinOrCreateRoom(raceId.ToString(), roomOptions, null);
-    }
-
-    public override void OnJoinedRoom()
-    {
-        base.OnJoinedRoom();
-        Debug.LogError($"Joined Room {PhotonNetwork.CurrentRoom.Name}");
-    }
-
     private IEnumerator CanStartRace()
     {
         ResponseInfo responseInfo = new();
@@ -193,9 +176,6 @@ public class Race : MonoBehaviourPunCallbacks
                     players.Add(player);
                 }
             }
-
-            // Call Narendra's Function
-            JoinArena();
         }
     }
 
@@ -250,12 +230,6 @@ public class Race : MonoBehaviourPunCallbacks
         {
             WalletManager.Instance.joinedRaceInfos.Remove((int)raceId);
             StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
-
-            // Multiplayer Logic
-            if (PhotonNetwork.InRoom)
-            {
-                PhotonNetwork.LeaveRoom();
-            }
         } else Debug.Log(responseInfo.message);
         yield return new WaitForSeconds(1);
         AptosUILink.Instance.LoadCurrentWalletBalance();

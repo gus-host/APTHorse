@@ -55,7 +55,7 @@ namespace Aptos.Unity.Sample.UI
             Mnemonic mnemo = new Mnemonic(Wordlist.English, WordCount.Twelve);
             wallet = new Wallet(mnemo);
 
-            PlayerPrefs.SetString(mnemonicsKey, mnemo.ToString());
+            PlayerPrefs.SetString(mnemonicsKey + (WalletManager.Instance.devMode ? WalletManager.Instance.instanceId.value : ""), mnemo.ToString());
             PlayerPrefs.SetInt(currentAddressIndexKey, 0);
 
             GetWalletAddress();
