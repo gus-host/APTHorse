@@ -31,6 +31,10 @@ public class Race : MonoBehaviourPunCallbacks
     {
         joinRaceButton.onClick.AddListener(() => StartCoroutine(JoinRace()));
         leaveRaceButton.onClick.AddListener(() => StartCoroutine(LeaveRace()));
+        if (inRace && !PhotonNetwork.InRoom && PhotonNetwork.IsConnected)
+        {
+            JoinArena();
+        }
     }
 
     public void SetupRace(ulong raceId, string raceName, int racePrice, int raceLaps, bool raceStarted, JSONNode players)
@@ -124,6 +128,7 @@ public class Race : MonoBehaviourPunCallbacks
             });
             yield return StartCoroutine(CanStartRace());
             yield return StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
+            JoinArena();
         }
         else Debug.Log(responseInfo.message);
         yield return new WaitForSeconds(1);
@@ -192,11 +197,18 @@ public class Race : MonoBehaviourPunCallbacks
                     };
                     players.Add(player);
                 }
+                SwitchToRace(players, raceId);
             }
 
             // Call Narendra's Function
-            JoinArena();
+            
         }
+    }
+
+    private void SwitchToRace(List<RacePlayer> players, int raceId)
+    {
+        //We will store the variables
+        PhotonNetwork.LoadLevel("HorseJockey");
     }
 
     public IEnumerator LeaveRace()
