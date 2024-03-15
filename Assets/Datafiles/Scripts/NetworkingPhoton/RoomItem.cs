@@ -24,8 +24,6 @@ public class RoomItem : MonoBehaviour
     }
     private void JoinRoom()
     {
-        _lobbyManager.JoinRoom(_roomName.text);
+        //_lobbyManager.JoinRoom(_roomName.text);
     }
-    
-    
 }

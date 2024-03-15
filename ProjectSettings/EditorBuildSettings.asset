@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Datafiles/Scenes/Lobby.unity
-    guid: 0931e95a58a08e24db639ee88d9d357e
+    path: Assets/Datafiles/Scenes/MainMenu.unity
+    guid: 91b5de6f0af9353eaa906e700f064f35
   - enabled: 1
     path: Assets/Datafiles/Scenes/HorseJockey.unity
     guid: 0c7981e50b297054fa6daf8354385f61

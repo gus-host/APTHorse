@@ -28,6 +28,8 @@ public class WalletManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI AptosAddress;
     [SerializeField] private TextMeshProUGUI AptosUsername;
 
+    public PvPPhotonLobbyManager serverManager;
+
     [HideInInspector] public Wallet Wallet = null;
     [HideInInspector] public float APTBalance;
     [HideInInspector] public string Username = "";
@@ -80,5 +82,10 @@ public class WalletManager : MonoBehaviour
     public void UpdateUsername()
     {
         AptosUsername.text = Username;
+        PlayerPrefs.SetString("Username", Username);
+        if (!string.IsNullOrEmpty(Username))
+        {
+            serverManager.gameObject.SetActive(true);
+        }
     }
 }
