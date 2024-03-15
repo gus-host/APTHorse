@@ -1,3 +1,6 @@
+//Race Ids denotes Room feature like 0 for 1 Lap, 1 for 3 Lap, 2 for 5 lap
+
+
 using Photon.Pun;
 using System;
 using System.Collections.Generic;
@@ -74,6 +77,9 @@ public class RaceManager : MonoBehaviourPunCallbacks
             photonView.RPC("StartRace", RpcTarget.AllBuffered);
         });
     }
+
+
+
 
     [PunRPC]
     private void StartRace()

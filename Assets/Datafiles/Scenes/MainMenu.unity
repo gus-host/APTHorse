@@ -840,6 +840,7 @@ MonoBehaviour:
   AptosUsername: {fileID: 516433789}
   APTBalance: 0
   Username: 
+  EquippedHorseId: 1000
 --- !u!4 &227476187
 Transform:
   m_ObjectHideFlags: 0
