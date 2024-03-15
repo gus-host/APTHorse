@@ -24,6 +24,11 @@ public class WalletManager : MonoBehaviour
 {
     public static WalletManager Instance { get; private set; }
 
+    //DEV USE ONLY - InstanceID
+    public bool devMode = false;
+    public TMP_Dropdown instanceId;
+    [SerializeField] private GameObject DevPanel;
+
     [SerializeField] private TextMeshProUGUI AptosTokenBalance;
     [SerializeField] private TextMeshProUGUI AptosAddress;
     [SerializeField] private TextMeshProUGUI AptosUsername;
@@ -50,6 +55,7 @@ public class WalletManager : MonoBehaviour
     void Start()
     {
         //PlayerPrefs.DeleteAll();
+        if (devMode) DevPanel.SetActive(true);
         AptosUILink.Instance.onGetBalance += val =>
         {
             APTBalance = val;
@@ -64,11 +70,11 @@ public class WalletManager : MonoBehaviour
     {
         if (Wallet != null) return true;
 
-        string mneomicsKey = PlayerPrefs.GetString(AptosUILink.Instance.mnemonicsKey, "");
+        string mneomicsKey = PlayerPrefs.GetString(AptosUILink.Instance.mnemonicsKey + (devMode ? instanceId.value : ""), "");
         if (string.IsNullOrEmpty(mneomicsKey))
         {
             if (!AptosUILink.Instance.CreateNewWallet()) return false;
-            mneomicsKey = PlayerPrefs.GetString(AptosUILink.Instance.mnemonicsKey, "");
+            mneomicsKey = PlayerPrefs.GetString(AptosUILink.Instance.mnemonicsKey + (devMode ? instanceId.value : ""), "");
         }
         else if (!AptosUILink.Instance.RestoreWallet(mneomicsKey)) return false;
 
