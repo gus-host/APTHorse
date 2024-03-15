@@ -68,7 +68,7 @@ public class NFT : MonoBehaviour
 
         ResponseInfo responseInfo = new();
 
-        byte[] bytes = "a94a9da70feb4596757bce720b8b612c9ef54783f84316f7cb5523b5eb4e47d7".ByteArrayFromHexString();
+        byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
         Sequence sequence = new(new ISerializable[] { new U64(id) });
 
         var payload = new EntryFunction
@@ -115,7 +115,7 @@ public class NFT : MonoBehaviour
     {
         ResponseInfo responseInfo = new();
 
-        byte[] bytes = "a94a9da70feb4596757bce720b8b612c9ef54783f84316f7cb5523b5eb4e47d7".ByteArrayFromHexString();
+        byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
         Sequence sequence = new(new ISerializable[] { new U64(equip_id == 10000000 ? id : equip_id) });
 
         var payload = new EntryFunction

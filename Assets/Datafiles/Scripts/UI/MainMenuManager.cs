@@ -33,7 +33,7 @@ public class MainMenuManager : MonoBehaviour
 
         ViewRequest viewRequest = new()
         {
-            Function = "0xa94a9da70feb4596757bce720b8b612c9ef54783f84316f7cb5523b5eb4e47d7::aptos_horses_user::get_username",
+            Function = "0xdafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead::aptos_horses_user::get_username",
             TypeArguments = new string[] { },
             Arguments = new string[] { WalletManager.Instance.Wallet.Account.AccountAddress.ToString() }
         };
@@ -75,7 +75,7 @@ public class MainMenuManager : MonoBehaviour
         Debug.LogError("Error: Account doesnt exist, creating a new account!");
         ResponseInfo responseInfo = new();
 
-        byte[] bytes = "a94a9da70feb4596757bce720b8b612c9ef54783f84316f7cb5523b5eb4e47d7".ByteArrayFromHexString();
+        byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
         Sequence sequence = new(new ISerializable[] { new BString(username) });
 
         EntryFunction payload = new(
@@ -123,7 +123,7 @@ public class MainMenuManager : MonoBehaviour
         Debug.Log("Log: Updating Username!");
         ResponseInfo responseInfo = new();
 
-        byte[] bytes = "a94a9da70feb4596757bce720b8b612c9ef54783f84316f7cb5523b5eb4e47d7".ByteArrayFromHexString();
+        byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
         Sequence sequence = new(new ISerializable[] { new BString(username) });
 
         EntryFunction payload = new(

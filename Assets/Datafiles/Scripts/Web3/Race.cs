@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Aptos.Accounts;
 using Aptos.BCS;
 using Aptos.HdWallet.Utils;
@@ -65,9 +66,15 @@ public class Race : MonoBehaviour
             yield break;
         }
 
+        if (WalletManager.Instance.EquippedHorseId == 1000)
+        {
+            Debug.LogError("No horse equipped! Please equip a horse.");
+            yield break;
+        }
+
         ResponseInfo responseInfo = new();
 
-        byte[] bytes = "a94a9da70feb4596757bce720b8b612c9ef54783f84316f7cb5523b5eb4e47d7".ByteArrayFromHexString();
+        byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
         Sequence sequence = new(new ISerializable[] { new U64(raceId) });
 
         var payload = new EntryFunction
@@ -106,6 +113,12 @@ public class Race : MonoBehaviour
         Debug.Log(responseInfo.status);
         if (responseInfo.status == ResponseInfo.Status.Success)
         {
+            WalletManager.Instance.joinedRaceInfos.Add((int)raceId, new JoinedRaceInfo {
+                playerAddress = WalletManager.Instance.Address,
+                playerName = WalletManager.Instance.Username,
+                horseId = WalletManager.Instance.EquippedHorseId,
+                horseSpeed = FindObjectOfType<MarketplaceManager>().GetHorseSpeedById(WalletManager.Instance.EquippedHorseId)
+            });
             yield return StartCoroutine(CanStartRace());
             yield return StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
         }
@@ -121,7 +134,7 @@ public class Race : MonoBehaviour
 
         ViewRequest viewRequest = new()
         {
-            Function = "0xa94a9da70feb4596757bce720b8b612c9ef54783f84316f7cb5523b5eb4e47d7::aptos_horses_game::can_start_race",
+            Function = "0xdafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead::aptos_horses_game::can_start_race",
             TypeArguments = new string[] { },
             Arguments = new string[] { WalletManager.Instance.Wallet.Account.AccountAddress.ToString(), new U64(raceId).ToString() }
         };
@@ -135,10 +148,36 @@ public class Race : MonoBehaviour
 
         yield return getUser;
 
-        if (responseInfo.status == ResponseInfo.Status.Failed) Debug.LogError("Error: Fetching data failed!");
+        if (responseInfo.status != ResponseInfo.Status.Success) Debug.LogError("Error: Fetching data failed!");
         else
         {
-            Debug.Log(data);
+            JSONNode node = JSONNode.Parse(data);
+            bool canStart = node[0].AsBool;
+            if (canStart)
+            {
+                int raceId = node[1];
+                JSONNode randomAcceleration = node[2];
+                JSONNode randomHurdles = node[3];
+
+                List<RacePlayer> players = new();
+                for (int i = 0; i < randomAcceleration.Count; i++)
+                {
+                    List<float> playerHurdles = new();
+                    for (int j = 0; j < randomHurdles[i].Count; j++)
+                    {
+                        playerHurdles.Add(randomHurdles[i][j] / 100);
+                    }
+
+                    RacePlayer player = new()
+                    {
+                        acceleration = randomAcceleration[0] / 100,
+                        hurdles = playerHurdles
+                    };
+                    players.Add(player);
+                }
+            }
+
+            // Call Narendra's Function
         }
     }
 
@@ -152,7 +191,7 @@ public class Race : MonoBehaviour
 
         ResponseInfo responseInfo = new();
 
-        byte[] bytes = "a94a9da70feb4596757bce720b8b612c9ef54783f84316f7cb5523b5eb4e47d7".ByteArrayFromHexString();
+        byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
         Sequence sequence = new(new ISerializable[] { new U64(raceId) });
 
         var payload = new EntryFunction
@@ -189,8 +228,11 @@ public class Race : MonoBehaviour
         yield return waitForTransactionCor;
 
         Debug.Log(responseInfo.status);
-        if (responseInfo.status == ResponseInfo.Status.Success) StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
-        else Debug.Log(responseInfo.message);
+        if (responseInfo.status == ResponseInfo.Status.Success) 
+        {
+            WalletManager.Instance.joinedRaceInfos.Remove((int)raceId);
+            StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
+        } else Debug.Log(responseInfo.message);
         yield return new WaitForSeconds(1);
         AptosUILink.Instance.LoadCurrentWalletBalance();
     }

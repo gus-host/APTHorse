@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Aptos.Unity.Rest;
 using Aptos.Unity.Rest.Model;
 using GraphQlClient.Core;
@@ -14,7 +13,7 @@ public class MarketplaceManager : MonoBehaviour
     public NFT nftGo;
     public Transform nftSpawn;
     public Sprite[] horseSprite;
-    public List<string> ownedHorsesNames = new();
+    private Dictionary<int, int> ownedHorses = new();
     [SerializeField] private GraphApi getAllTokensGraphQL;
     public IEnumerator GetMarketplaceDataAsync()
     {
@@ -23,7 +22,7 @@ public class MarketplaceManager : MonoBehaviour
 
         ViewRequest viewRequest = new()
         {
-            Function = "0xa94a9da70feb4596757bce720b8b612c9ef54783f84316f7cb5523b5eb4e47d7::aptos_horses::get_all_metadata",
+            Function = "0xdafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead::aptos_horses::get_all_metadata",
             TypeArguments = new string[] { },
             Arguments = new string[] {  }
         };
@@ -48,7 +47,7 @@ public class MarketplaceManager : MonoBehaviour
 
         ViewRequest viewRequest = new()
         {
-            Function = "0xa94a9da70feb4596757bce720b8b612c9ef54783f84316f7cb5523b5eb4e47d7::aptos_horses_user::get_equiped_horse",
+            Function = "0xdafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead::aptos_horses_user::get_equiped_horse",
             TypeArguments = new string[] { },
             Arguments = new string[] { WalletManager.Instance.Wallet.Account.AccountAddress.ToString() }
         };
@@ -72,17 +71,18 @@ public class MarketplaceManager : MonoBehaviour
     private async void AssignData(string data, int equippedHorse)
     {
         WalletManager.Instance.EquippedHorseId = equippedHorse;
-        UnityWebRequest request = await getAllTokensGraphQL.Post("query MyQuery {current_token_ownerships_v2(where: {owner_address: {_eq: \"" + WalletManager.Instance.Wallet.Account.AccountAddress.ToString() + "\"}}){current_token_data{current_collection{collection_name}token_uri token_name description}}}");
+        UnityWebRequest request = await getAllTokensGraphQL.Post("query MyQuery {current_token_ownerships_v2(where: {owner_address: {_eq: \"" + WalletManager.Instance.Wallet.Account.AccountAddress.ToString() + "\"}}){current_token_data{current_collection{collection_name}token_uri}}}");
 
         string ownedData = request.downloadHandler.text;
         JSONNode tokens = JSON.Parse(ownedData)["data"]["current_token_ownerships_v2"];
 
-        ownedHorsesNames = new();
+        ownedHorses = new();
         for (int i = 0; i < tokens.Count; i++)
         {
             if (tokens[i]["current_token_data"]["current_collection"]["collection_name"] == "APTHorse")
             {
-                ownedHorsesNames.Add(tokens[i]["current_token_data"]["token_name"].Value);
+                string[] split = tokens[i]["current_token_data"]["token_uri"].Value.Split(",");
+                ownedHorses.Add(int.Parse(split[0]), int.Parse(split[1]));
             }
         }
 
@@ -101,9 +101,14 @@ public class MarketplaceManager : MonoBehaviour
                 node[0][i]["price"].AsInt,
                 horseSprite[i],
                 (ulong)node[0][i]["id"].AsInt,
-                ownedHorsesNames.Contains(node[0][i]["name"].Value),
+                ownedHorses.ContainsKey(node[0][i]["id"].AsInt),
                 node[0][i]["id"].AsInt == equippedHorse
             );
         }
+    }
+
+    public int GetHorseSpeedById(int id)
+    {
+        return ownedHorses[id];
     }
 }
