@@ -57,6 +57,8 @@ MonoBehaviour:
   - SetLastLap
   - SetLapReductionProcessed
   - RPCDelayLapReductionProcessed
+  - SwitchToRace
+  - ToggleSwitch
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

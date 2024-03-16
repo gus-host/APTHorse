@@ -54,7 +54,7 @@ public class MainMenuManager : MonoBehaviour
             WalletManager.Instance.UpdateUsername();
             InfoPanel.SetActive(true);
             MarketplaceButton.SetActive(true);
-            RacesButton.SetActive(true);
+            //RacesButton.SetActive(true);
             StartCoroutine(FindObjectOfType<MarketplaceManager>().GetMarketplaceDataAsync());
             StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
         }

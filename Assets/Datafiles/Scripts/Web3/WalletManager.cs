@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
 using Aptos.HdWallet;
 using Aptos.Unity.Rest;
 using Aptos.Unity.Sample.UI;
+using Photon.Pun;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public struct JoinedRaceInfo
@@ -13,14 +16,14 @@ public struct JoinedRaceInfo
     public int horseSpeed;
 }
 
-struct RacePlayer
+public struct RacePlayer
 {
     public JoinedRaceInfo joinedRaceInfo;
     public float acceleration;
     public List<float> hurdles;
 }
 
-public class WalletManager : MonoBehaviour
+public class WalletManager : MonoBehaviourPunCallbacks
 {
     public static WalletManager Instance { get; private set; }
 
@@ -32,8 +35,11 @@ public class WalletManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI AptosTokenBalance;
     [SerializeField] private TextMeshProUGUI AptosAddress;
     [SerializeField] private TextMeshProUGUI AptosUsername;
+    [SerializeField] public TextMeshProUGUI _currentRoomName;
 
     public PvPPhotonLobbyManager serverManager;
+    public List<RacePlayer> racePlayer = new();
+    public int raceId;
 
     [HideInInspector] public Wallet Wallet = null;
     [HideInInspector] public float APTBalance;
@@ -42,10 +48,12 @@ public class WalletManager : MonoBehaviour
     [HideInInspector] public int EquippedHorseId = 1000;
     [HideInInspector] public Dictionary<int, JoinedRaceInfo> joinedRaceInfos = new();
 
+    public bool _canSwitch = false;
+
     void Awake()
     {
         if (Instance != null && Instance != this) Destroy(gameObject);
-        else 
+        else
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
@@ -92,6 +100,71 @@ public class WalletManager : MonoBehaviour
         if (!string.IsNullOrEmpty(Username))
         {
             serverManager.gameObject.SetActive(true);
+        }
+    }
+    public override void OnCreatedRoom()
+    {
+        if (PhotonNetwork.InRoom)
+        {
+            _currentRoomName.text = "Room name:- " + PhotonNetwork.CurrentRoom.Name + " " + PhotonNetwork.CurrentRoom.PlayerCount + "/" + PhotonNetwork.CurrentRoom.MaxPlayers;
+        }
+    }
+
+    public override void OnJoinedRoom()
+    {
+        base.OnJoinedRoom();
+        _currentRoomName.text = "Room name:- " + PhotonNetwork.CurrentRoom.Name +" "+ PhotonNetwork.CurrentRoom.PlayerCount+"/" + PhotonNetwork.CurrentRoom.MaxPlayers;
+    }
+
+    public override void OnLeftRoom()
+    {
+        base.OnLeftRoom();
+        _currentRoomName.text = "NOT IN ROOM";
+    }
+    public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
+    {
+        base.OnPlayerEnteredRoom(newPlayer);
+        _currentRoomName.text = "Room name:- " + PhotonNetwork.CurrentRoom.Name + " " + PhotonNetwork.CurrentRoom.PlayerCount + "/" + PhotonNetwork.CurrentRoom.MaxPlayers;
+        Debug.LogError("Assigning");
+        if(PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers && _canSwitch)
+        {
+            InitSceneSwitchRPC();
+        }
+    }
+
+    public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
+    {
+        base.OnPlayerLeftRoom(otherPlayer);
+        _currentRoomName.text = "Room name:- " + PhotonNetwork.CurrentRoom.Name + " " + PhotonNetwork.CurrentRoom.PlayerCount + "/" + PhotonNetwork.CurrentRoom.MaxPlayers;
+    }
+
+    internal void InitSceneSwitchRPC()
+    {
+        Debug.LogError("InitSceneSwitch");
+        photonView.RPC("SwitchToRace", RpcTarget.AllBufferedViaServer);
+    }
+
+    public void RPCToggleSwitch()
+    {
+        Debug.LogError("RPCToggleSwitch");
+        photonView.RPC("ToggleSwitch", RpcTarget.AllBufferedViaServer);
+    }
+
+    [PunRPC]
+    public void ToggleSwitch()
+    {
+        _canSwitch = true;
+    }
+
+
+    [PunRPC]
+    private void SwitchToRace()
+    {
+        //We will store the variables
+        Debug.LogError("Loading scene");
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.LoadLevel("HorseJockey");
         }
     }
 }
