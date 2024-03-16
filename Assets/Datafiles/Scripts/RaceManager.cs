@@ -30,6 +30,7 @@ public class RaceManager : MonoBehaviourPunCallbacks
     public int totalLap;
     
     public HorseController[] jockeys;
+    public int jockeysIndex = 0;
     public List<HorseController> _horseRanks = new List<HorseController>();
     static Action UpdateAtt;
 
@@ -79,6 +80,10 @@ public class RaceManager : MonoBehaviourPunCallbacks
     }
 
 
+    public void AddHorse(HorseController _horse)
+    {
+        jockeys[jockeysIndex++] = _horse;
+    }
 
 
     [PunRPC]

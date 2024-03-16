@@ -6,12 +6,14 @@ using Aptos.HdWallet.Utils;
 using Aptos.Unity.Rest;
 using Aptos.Unity.Rest.Model;
 using Aptos.Unity.Sample.UI;
+using Photon.Pun;
+using Photon.Realtime;
 using SimpleJSON;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Race : MonoBehaviour
+public class Race : MonoBehaviourPunCallbacks
 {
     public TextMeshProUGUI raceNameText;
     public TextMeshProUGUI racePriceText;
@@ -28,6 +30,10 @@ public class Race : MonoBehaviour
     {
         joinRaceButton.onClick.AddListener(() => StartCoroutine(JoinRace()));
         leaveRaceButton.onClick.AddListener(() => StartCoroutine(LeaveRace()));
+        if (inRace && !PhotonNetwork.InRoom && PhotonNetwork.IsConnected)
+        {
+            JoinArena();
+        }
     }
 
     public void SetupRace(ulong raceId, string raceName, int racePrice, int raceLaps, bool raceStarted, JSONNode players)
@@ -121,6 +127,7 @@ public class Race : MonoBehaviour
             });
             yield return StartCoroutine(CanStartRace());
             yield return StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
+            JoinArena();
         }
         else Debug.Log(responseInfo.message);
         yield return new WaitForSeconds(1);
@@ -152,6 +159,7 @@ public class Race : MonoBehaviour
         else
         {
             JSONNode node = JSONNode.Parse(data);
+            Debug.LogError($"JSON {data}");
             bool canStart = node[0].AsBool;
             if (canStart)
             {
@@ -175,8 +183,19 @@ public class Race : MonoBehaviour
                     };
                     players.Add(player);
                 }
+                WalletManager.Instance.racePlayer = players;
+                WalletManager.Instance.raceId = raceId;
+                WalletManager.Instance._canSwitch = true;
+                WalletManager.Instance.RPCToggleSwitch();
             }
         }
+    }
+    private void JoinArena()
+    {
+        Debug.LogError($"JoinArena");
+        Debug.LogError($"Race Id {raceId} && {PhotonNetwork.Server}");
+        RoomOptions roomOptions = new RoomOptions() { MaxPlayers = 5, IsOpen = true, IsVisible = true };
+        PhotonNetwork.JoinOrCreateRoom(raceId.ToString(), roomOptions, null);
     }
 
     public IEnumerator LeaveRace()
@@ -230,6 +249,10 @@ public class Race : MonoBehaviour
         {
             WalletManager.Instance.joinedRaceInfos.Remove((int)raceId);
             StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
+            if (PhotonNetwork.InRoom)
+            {
+                PhotonNetwork.LeaveRoom();
+            }
         } else Debug.Log(responseInfo.message);
         yield return new WaitForSeconds(1);
         AptosUILink.Instance.LoadCurrentWalletBalance();

@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class PvPPhotonLobbyManager : MonoBehaviourPunCallbacks
 {
+    public GameObject Footer;
+
     private void Start()
     {
         PhotonNetwork.AutomaticallySyncScene = true;
@@ -15,6 +17,7 @@ public class PvPPhotonLobbyManager : MonoBehaviourPunCallbacks
         if (!string.IsNullOrEmpty(userName))
         {
             PhotonNetwork.NickName = userName;
+            Debug.LogError($"username {userName}");
             PhotonNetwork.ConnectUsingSettings();
         }
         else
@@ -26,6 +29,8 @@ public class PvPPhotonLobbyManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         base.OnConnectedToMaster();
+        Footer.SetActive( true );
+
     }
 
     public override void OnCreatedRoom()

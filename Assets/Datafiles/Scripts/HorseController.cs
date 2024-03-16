@@ -80,9 +80,9 @@ public class HorseController : MonoBehaviourPunCallbacks
         #region
         horseId = playerProperties.id - 1;
         
-        if (horseId >= 0 && horseId < raceManager.jockeys.Length)
+        if (raceManager.jockeys.Length <=5)
         {
-            raceManager.jockeys[horseId] = this;
+            raceManager.AddHorse(this);
         }
         else
         {
