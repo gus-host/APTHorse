@@ -24,7 +24,7 @@ public class MarketplaceManager : MonoBehaviour
         {
             Function = "0xdafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead::aptos_horses::get_all_metadata",
             TypeArguments = new string[] { },
-            Arguments = new string[] {  }
+            Arguments = new string[] { }
         };
 
         Coroutine getUser = StartCoroutine(RestClient.Instance.View((_data, _responseInfo) =>

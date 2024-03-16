@@ -16,6 +16,12 @@ public class MainMenuManager : MonoBehaviour
     public GameObject InfoPanel;
     public GameObject MarketplaceButton;
     public GameObject RacesButton;
+    private SpinnerManager spinnerManager;
+
+    void Start()
+    {
+        spinnerManager = FindObjectOfType<SpinnerManager>();
+    }
 
     public void SignIn()
     {
@@ -28,6 +34,7 @@ public class MainMenuManager : MonoBehaviour
 
     private IEnumerator GetUser()
     {
+        spinnerManager.ShowMessage("Fetching User..");
         ResponseInfo responseInfo = new();
         string[] data = new string[] { };
 
@@ -47,6 +54,7 @@ public class MainMenuManager : MonoBehaviour
 
         yield return getUser;
 
+        spinnerManager.HideMessage();
         if (responseInfo.status == ResponseInfo.Status.Failed) EnterUsernamePanel.SetActive(true);
         else
         {
@@ -73,6 +81,8 @@ public class MainMenuManager : MonoBehaviour
     private IEnumerator CreateUserEnumerator(string username)
     {
         Debug.LogError("Error: Account doesnt exist, creating a new account!");
+        EnterUsernamePanel.SetActive(false);
+        spinnerManager.ShowMessage("Creating User...");
         ResponseInfo responseInfo = new();
 
         byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
@@ -110,17 +120,16 @@ public class MainMenuManager : MonoBehaviour
         );
         yield return waitForTransactionCor;
 
+        spinnerManager.HideMessage();
         if (responseInfo.status != ResponseInfo.Status.Success) Debug.LogWarning("Transaction was not found. Breaking out of example: Error: " + responseInfo.message);
-        else
-        {
-            StartCoroutine(GetUser()); 
-            EnterUsernamePanel.SetActive(false);
-        }
+        else StartCoroutine(GetUser()); 
     }
 
     private IEnumerator UpdateUsernameEnumerator(string username)
     {
         Debug.Log("Log: Updating Username!");
+        UpdateUsernamePanel.SetActive(false);
+        spinnerManager.ShowMessage("Updating Username...");
         ResponseInfo responseInfo = new();
 
         byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
@@ -158,11 +167,8 @@ public class MainMenuManager : MonoBehaviour
         );
         yield return waitForTransactionCor;
 
+        spinnerManager.HideMessage();
         if (responseInfo.status != ResponseInfo.Status.Success) Debug.LogWarning("Transaction was not found. Breaking out of example: Error: " + responseInfo.message);
-        else
-        {
-            StartCoroutine(GetUser());
-            UpdateUsernamePanel.SetActive(false);
-        }
+        else StartCoroutine(GetUser());
     }
 }

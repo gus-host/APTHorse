@@ -25,6 +25,7 @@ public class Race : MonoBehaviourPunCallbacks
     private int racePrice;
     private int raceLaps;
     private bool inRace = false;
+    private SpinnerManager spinnerManager;
 
     void Start()
     {
@@ -38,6 +39,7 @@ public class Race : MonoBehaviourPunCallbacks
 
     public void SetupRace(ulong raceId, string raceName, int racePrice, int raceLaps, bool raceStarted, JSONNode players)
     {
+        spinnerManager = FindObjectOfType<SpinnerManager>();
         this.raceId = raceId;
         this.racePrice = racePrice;
         this.raceLaps = raceLaps;
@@ -60,8 +62,28 @@ public class Race : MonoBehaviourPunCallbacks
         joinRaceButton.gameObject.SetActive(false);
         leaveRaceButton.gameObject.SetActive(false);
 
-        if (inRace) leaveRaceButton.gameObject.SetActive(true);
-        else joinRaceButton.gameObject.SetActive(true);
+        if (inRace)
+        {
+            leaveRaceButton.gameObject.SetActive(true);
+            LockOtherRaces(true);
+        }
+        else
+        {
+            joinRaceButton.gameObject.SetActive(true);
+            LockOtherRaces(false);
+        }
+
+        spinnerManager.HideMessage();
+    }
+
+    private void LockOtherRaces(bool disableOthers)
+    {
+        Race[] races = FindObjectsOfType<Race>();
+        for (int i = 0; i < races.Length; i++)
+        {
+            if (disableOthers && races[i] != this) races[i].joinRaceButton.gameObject.SetActive(false);
+            else races[i].joinRaceButton.gameObject.SetActive(true);
+        }
     }
 
     public IEnumerator JoinRace()
@@ -78,6 +100,7 @@ public class Race : MonoBehaviourPunCallbacks
             yield break;
         }
 
+        spinnerManager.ShowMessage("Joining Race...");
         ResponseInfo responseInfo = new();
 
         byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
@@ -117,9 +140,11 @@ public class Race : MonoBehaviourPunCallbacks
         yield return waitForTransactionCor;
 
         Debug.Log(responseInfo.status);
+
         if (responseInfo.status == ResponseInfo.Status.Success)
         {
-            WalletManager.Instance.joinedRaceInfos.Add((int)raceId, new JoinedRaceInfo {
+            WalletManager.Instance.joinedRaceInfos.Add((int)raceId, new JoinedRaceInfo
+            {
                 playerAddress = WalletManager.Instance.Address,
                 playerName = WalletManager.Instance.Username,
                 horseId = WalletManager.Instance.EquippedHorseId,
@@ -129,7 +154,11 @@ public class Race : MonoBehaviourPunCallbacks
             yield return StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
             JoinArena();
         }
-        else Debug.Log(responseInfo.message);
+        else
+        {
+            Debug.Log(responseInfo.message);
+            spinnerManager.HideMessage();
+        } 
         yield return new WaitForSeconds(1);
         AptosUILink.Instance.LoadCurrentWalletBalance();
     }
@@ -206,6 +235,7 @@ public class Race : MonoBehaviourPunCallbacks
             yield break;
         }
 
+        spinnerManager.ShowMessage("Leaving Race...");
         ResponseInfo responseInfo = new();
 
         byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
@@ -245,7 +275,7 @@ public class Race : MonoBehaviourPunCallbacks
         yield return waitForTransactionCor;
 
         Debug.Log(responseInfo.status);
-        if (responseInfo.status == ResponseInfo.Status.Success) 
+        if (responseInfo.status == ResponseInfo.Status.Success)
         {
             WalletManager.Instance.joinedRaceInfos.Remove((int)raceId);
             StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
@@ -253,7 +283,12 @@ public class Race : MonoBehaviourPunCallbacks
             {
                 PhotonNetwork.LeaveRoom();
             }
-        } else Debug.Log(responseInfo.message);
+        }
+        else
+        {
+            Debug.Log(responseInfo.message);
+            spinnerManager.HideMessage();
+        } 
         yield return new WaitForSeconds(1);
         AptosUILink.Instance.LoadCurrentWalletBalance();
     }
