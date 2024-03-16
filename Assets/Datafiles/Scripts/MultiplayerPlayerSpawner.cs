@@ -68,7 +68,44 @@ public class MultiplayerPlayerSpawner : MonoBehaviourPunCallbacks
         }
         else
         {
-            for (int i = 1; i < 5; i++) // Start from index 2 as per your custom properties
+            int devmode = PlayerPrefs.GetInt("Devmode");
+            if(devmode == 0)
+            {
+                spawnPointIndex = PlayerPrefs.GetInt("PlayerId");
+            }else if (devmode == 1)
+            {
+                string keyOne = "PlayerId1";
+                string keyTwo = "PlayerId2";
+                string keyThree = "PlayerId3";
+                string keyFour = "PlayerId4";
+                if (PlayerPrefs.HasKey(keyOne))
+                {
+                    Debug.LogError($"Spawning Player {keyOne}");
+                    spawnPointIndex = PlayerPrefs.GetInt(keyOne);
+                    PlayerPrefs.DeleteKey(keyOne);
+                }
+                else if (PlayerPrefs.HasKey(keyTwo))
+                {
+                    Debug.LogError($"Spawning Player {keyTwo}");
+                    spawnPointIndex = PlayerPrefs.GetInt(keyTwo);
+                    PlayerPrefs.DeleteKey(keyTwo);
+                }
+                else if (PlayerPrefs.HasKey(keyThree))
+                {
+                    Debug.LogError($"Spawning Player {keyThree}");
+                    spawnPointIndex = PlayerPrefs.GetInt(keyThree);
+                    PlayerPrefs.DeleteKey(keyThree);
+                }
+                else if (PlayerPrefs.HasKey(keyFour))
+                {
+                    Debug.LogError($"Spawning Player {keyFour}");
+                    spawnPointIndex = PlayerPrefs.GetInt(keyFour);
+                    PlayerPrefs.DeleteKey(keyFour);
+                }
+                
+
+            }
+/*            for (int i = 1; i < 5; i++) // Start from index 2 as per your custom properties
             {
                 bool spawnpointInstance = (bool)PhotonNetwork.CurrentRoom.CustomProperties["SpawnPointIndex" + i];
                 if (!spawnpointInstance)
@@ -78,52 +115,7 @@ public class MultiplayerPlayerSpawner : MonoBehaviourPunCallbacks
                     PhotonNetwork.CurrentRoom.CustomProperties["SpawnPointIndex" + i] = true;
                     break;
                 }
-            }
-            /*            //Get the bool value
-                        bool spawnpointInstance = (bool)PhotonNetwork.CurrentRoom.CustomProperties["SpawnPointIndexTwo"];
-                        //Check for false
-                        if (!spawnpointInstance)
-                        {
-                            //If not used assign its value to index make it used
-                            spawnPointIndex = 1;
-                            PhotonNetwork.CurrentRoom.CustomProperties["SpawnPointIndexTwo"] = true;
-                        }
-                        else if(spawnpointInstance)
-                        {
-                            //Get the bool value
-                            spawnpointInstance = (bool)PhotonNetwork.CurrentRoom.CustomProperties["SpawnPointIndexThree"];
-                            //Check for false
-                            if (!spawnpointInstance)
-                            {
-                                //If not used assign its value to index make it used
-                                spawnPointIndex = 2;
-                                PhotonNetwork.CurrentRoom.CustomProperties["SpawnPointIndexThree"] = true;
-                            }
-                            else if (spawnpointInstance)
-                            {
-                                //Get the bool value
-                                spawnpointInstance = (bool)PhotonNetwork.CurrentRoom.CustomProperties["SpawnPointIndexfour"];
-                                //Check for false
-                                if (!spawnpointInstance)
-                                {
-                                    //If not used assign its value to index make it used
-                                    spawnPointIndex = 3;
-                                    PhotonNetwork.CurrentRoom.CustomProperties["SpawnPointIndexfour"] = true;
-                                }
-                                else if (spawnpointInstance)
-                                {
-                                    //Get the bool value
-                                    spawnpointInstance = (bool)PhotonNetwork.CurrentRoom.CustomProperties["SpawnPointIndexfive"];
-                                    //Check for false
-                                    if (!spawnpointInstance)
-                                    {
-                                        //If not used assign its value to index make it used
-                                        spawnPointIndex = 4;
-                                        PhotonNetwork.CurrentRoom.CustomProperties["SpawnPointIndexfive"] = true;
-                                    }
-                                }
-                            }
-                        }*/
+            }*/
         }
 
         // Ensure the spawnPointIndex is within valid range

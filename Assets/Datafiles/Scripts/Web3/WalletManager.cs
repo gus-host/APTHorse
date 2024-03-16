@@ -63,6 +63,15 @@ public class WalletManager : MonoBehaviourPunCallbacks
     void Start()
     {
         //PlayerPrefs.DeleteAll();
+        PlayerPrefs.DeleteKey("PlayerId");
+        PlayerPrefs.DeleteKey("PlayerId1");
+        PlayerPrefs.DeleteKey("PlayerId2");
+        PlayerPrefs.DeleteKey("PlayerId3");
+        PlayerPrefs.DeleteKey("PlayerId4");
+
+
+
+
         if (devMode) DevPanel.SetActive(true);
         AptosUILink.Instance.onGetBalance += val =>
         {
@@ -85,7 +94,7 @@ public class WalletManager : MonoBehaviourPunCallbacks
             mneomicsKey = PlayerPrefs.GetString(AptosUILink.Instance.mnemonicsKey + (devMode ? instanceId.value : ""), "");
         }
         else if (!AptosUILink.Instance.RestoreWallet(mneomicsKey)) return false;
-
+         
         Wallet = new Wallet(mneomicsKey);
         Address = AptosUILink.Instance.GetCurrentWalletAddress();
         AptosAddress.text = $"Address : {Address}";
@@ -126,6 +135,17 @@ public class WalletManager : MonoBehaviourPunCallbacks
         base.OnPlayerEnteredRoom(newPlayer);
         _currentRoomName.text = "Room name:- " + PhotonNetwork.CurrentRoom.Name + " " + PhotonNetwork.CurrentRoom.PlayerCount + "/" + PhotonNetwork.CurrentRoom.MaxPlayers;
         Debug.LogError("Assigning");
+        int i = 0;
+        PlayerPrefs.SetInt("Devmode", i = devMode ? 1 : 0);
+        if (devMode)
+        {
+            string key = "PlayerId" + instanceId.value;
+            PlayerPrefs.SetInt(key, PhotonNetwork.CurrentRoom.PlayerCount-1);
+        }else if (!devMode)
+        {
+            PlayerPrefs.SetInt("PlayerId", PhotonNetwork.CurrentRoom.PlayerCount-1);
+        }
+        Debug.LogError($"PlayerId {PlayerPrefs.GetInt("PlayerId")}");
         if(PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers && _canSwitch)
         {
             InitSceneSwitchRPC();
@@ -166,5 +186,10 @@ public class WalletManager : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.LoadLevel("HorseJockey");
         }
+    }
+
+    internal void SaveHorseId(int val)
+    {
+        PlayerPrefs.SetInt("HorseId", val);
     }
 }
