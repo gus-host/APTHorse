@@ -1060,7 +1060,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8b693f9eab3ec9ffaae8083120b5ea5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  devMode: 0
+  devMode: 1
   instanceId: {fileID: 1141531793}
   DevPanel: {fileID: 306100766}
   AptosTokenBalance: {fileID: 870999713}
@@ -1069,6 +1069,8 @@ MonoBehaviour:
   _currentRoomName: {fileID: 1503340451}
   serverManager: {fileID: 1490476395}
   raceId: 0
+  spawnAt: 0
+  horseID: 0
   APTBalance: 0
   Username: 
   Address: 
@@ -1457,7 +1459,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -81.6, y: -75}
+  m_AnchoredPosition: {x: -81.6001, y: -75}
   m_SizeDelta: {x: 535.826, y: 85}
   m_Pivot: {x: 1, y: 1}
 --- !u!1 &336810612

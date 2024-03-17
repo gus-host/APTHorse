@@ -39,12 +39,14 @@ public class WalletManager : MonoBehaviourPunCallbacks
     public PvPPhotonLobbyManager serverManager;
     public List<RacePlayer> racePlayer = new();
     public int raceId;
+    public int spawnAt;
+    public int horseID;
 
     [HideInInspector] public Wallet Wallet = null;
     [HideInInspector] public float APTBalance;
     [HideInInspector] public string Username = "";
     [HideInInspector] public string Address = "";
-    [HideInInspector] public int EquippedHorseId = 1000;
+    public int EquippedHorseId = 1000;
     [HideInInspector] public Dictionary<int, JoinedRaceInfo> joinedRaceInfos = new();
 
     public bool _canSwitch = false;
@@ -134,20 +136,45 @@ public class WalletManager : MonoBehaviourPunCallbacks
         base.OnPlayerEnteredRoom(newPlayer);
         _currentRoomName.text = "Room name:- " + PhotonNetwork.CurrentRoom.Name + " " + PhotonNetwork.CurrentRoom.PlayerCount + "/" + PhotonNetwork.CurrentRoom.MaxPlayers;
         Debug.LogError("Assigning");
-        int i = 0;
-        PlayerPrefs.SetInt("Devmode", i = devMode ? 1 : 0);
-        if (devMode)
-        {
-            string key = "PlayerId" + instanceId.value;
-            PlayerPrefs.SetInt(key, PhotonNetwork.CurrentRoom.PlayerCount-1);
-        }else if (!devMode)
-        {
-            PlayerPrefs.SetInt("PlayerId", PhotonNetwork.CurrentRoom.PlayerCount-1);
-        }
-        Debug.LogError($"PlayerId {PlayerPrefs.GetInt("PlayerId")}");
-        if(PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers && _canSwitch)
+
+        RPCGenerateSpawnPoints();
+
+        /*
+                int i = 0;
+                PlayerPrefs.SetInt("Devmode", i = devMode ? 1 : 0);
+
+                if (devMode)
+                {
+                    string key = "PlayerId" + instanceId.value;
+                    PlayerPrefs.SetInt(key, PhotonNetwork.CurrentRoom.PlayerCount-1);
+                }else if (!devMode)
+                {
+                    PlayerPrefs.SetInt("PlayerId", PhotonNetwork.CurrentRoom.PlayerCount-1);
+                }
+
+                Debug.LogError($"PlayerId {PlayerPrefs.GetInt("PlayerId")}");*/
+        if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers && _canSwitch)
         {
             InitSceneSwitchRPC();
+        }
+    }
+
+    private void RPCGenerateSpawnPoints()
+    {
+        photonView.RPC("GenerateSpawnPoints", RpcTarget.AllBufferedViaServer);
+    }
+
+    [PunRPC]
+    public void GenerateSpawnPoints()
+    {
+            Debug.LogError("GenerateSpawnPoints");
+        for (int index = 0; index < racePlayer.Count; index++)
+        {
+            Debug.LogError("GenerateSpawnPoints");
+            if (racePlayer[index].joinedRaceInfo.playerName == PhotonNetwork.NickName)
+            {
+                spawnAt = index; //i-th spot
+            }
         }
     }
 
