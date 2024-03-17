@@ -23,6 +23,7 @@ public class NFT : MonoBehaviour
     private bool owns;
     private bool equipped;
     private ulong id;
+    private SpinnerManager spinnerManager;
 
     private void Start()
     {
@@ -33,6 +34,7 @@ public class NFT : MonoBehaviour
 
     public void SetupNFT(string nftName, string nftDesc, int nftPrice, Sprite nftSprite, ulong id, bool owns, bool equipped)
     {
+        spinnerManager = FindObjectOfType<SpinnerManager>();
         this.nftPrice = nftPrice;
         this.id = id;
         this.owns = owns;
@@ -56,6 +58,8 @@ public class NFT : MonoBehaviour
             else equipButton.gameObject.SetActive(true);
         }
         else buyButton.gameObject.SetActive(true);
+
+        spinnerManager.HideMessage();
     }
 
     private IEnumerator BuyNFT()
@@ -65,6 +69,8 @@ public class NFT : MonoBehaviour
             Debug.LogError("APT Balance too low!");
             yield break;
         }
+
+        spinnerManager.ShowMessage($"Buying {nftNameText.text}...");
 
         ResponseInfo responseInfo = new();
 
@@ -105,14 +111,20 @@ public class NFT : MonoBehaviour
         yield return waitForTransactionCor;
 
         Debug.Log(responseInfo.status);
+
         if (responseInfo.status == ResponseInfo.Status.Success) StartCoroutine(FindObjectOfType<MarketplaceManager>().GetMarketplaceDataAsync());
-        else Debug.Log(responseInfo.message);
+        else
+        {
+            Debug.Log(responseInfo.message);
+            spinnerManager.HideMessage();
+        } 
         yield return new WaitForSeconds(1);
         AptosUILink.Instance.LoadCurrentWalletBalance();
     }
 
     private IEnumerator EquipNFT(ulong equip_id = 10000000)
     {
+        spinnerManager.ShowMessage($"{(equip_id == 1000 ? "Unequipping" : "Equipping")} {nftNameText.text}...");
         ResponseInfo responseInfo = new();
 
         byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
@@ -152,8 +164,13 @@ public class NFT : MonoBehaviour
         yield return waitForTransactionCor;
 
         Debug.Log(responseInfo.status);
+
         if (responseInfo.status == ResponseInfo.Status.Success) StartCoroutine(FindObjectOfType<MarketplaceManager>().GetMarketplaceDataAsync());
-        else Debug.Log(responseInfo.message);
+        else
+        {
+            spinnerManager.HideMessage();
+            Debug.Log(responseInfo.message);
+        }
         yield return new WaitForSeconds(1);
         AptosUILink.Instance.LoadCurrentWalletBalance();
     }

@@ -5,7 +5,6 @@ using Aptos.Unity.Rest;
 using Aptos.Unity.Sample.UI;
 using Photon.Pun;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public struct JoinedRaceInfo
