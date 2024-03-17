@@ -183,6 +183,11 @@ public class Race : MonoBehaviourPunCallbacks
                     };
                     players.Add(player);
                 }
+
+                //Need to take horseId
+                /*public int horseId;
+                public int horseSpeed;
+                acceleration*/
                 WalletManager.Instance.racePlayer = players;
                 WalletManager.Instance.raceId = raceId;
                 WalletManager.Instance._canSwitch = true;

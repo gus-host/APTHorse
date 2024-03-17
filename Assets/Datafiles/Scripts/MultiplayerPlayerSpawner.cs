@@ -102,8 +102,6 @@ public class MultiplayerPlayerSpawner : MonoBehaviourPunCallbacks
                     spawnPointIndex = PlayerPrefs.GetInt(keyFour);
                     PlayerPrefs.DeleteKey(keyFour);
                 }
-                
-
             }
 /*            for (int i = 1; i < 5; i++) // Start from index 2 as per your custom properties
             {
