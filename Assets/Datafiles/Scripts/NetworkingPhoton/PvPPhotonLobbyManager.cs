@@ -30,7 +30,6 @@ public class PvPPhotonLobbyManager : MonoBehaviourPunCallbacks
     {
         base.OnConnectedToMaster();
         Footer.SetActive( true );
-
     }
 
     public override void OnCreatedRoom()

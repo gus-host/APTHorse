@@ -1060,6 +1060,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8b693f9eab3ec9ffaae8083120b5ea5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _serverInstance: {fileID: 4729309012281069743, guid: 6339ef9234901364198f9591eb9df0af, type: 3}
   devMode: 1
   instanceId: {fileID: 1141531793}
   DevPanel: {fileID: 306100766}
@@ -1071,6 +1072,8 @@ MonoBehaviour:
   raceId: 0
   spawnAt: 0
   horseID: 0
+  _horseSpeed: 0
+  _acceleration: 0
   APTBalance: 0
   Username: 
   Address: 

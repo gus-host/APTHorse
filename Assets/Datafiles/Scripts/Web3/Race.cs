@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Aptos.Accounts;
@@ -150,9 +151,9 @@ public class Race : MonoBehaviourPunCallbacks
                 horseId = WalletManager.Instance.EquippedHorseId,
                 horseSpeed = FindObjectOfType<MarketplaceManager>().GetHorseSpeedById(WalletManager.Instance.EquippedHorseId)
             });
+            JoinArena();
             yield return StartCoroutine(CanStartRace());
             yield return StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
-            JoinArena();
         }
         else
         {
@@ -197,7 +198,7 @@ public class Race : MonoBehaviourPunCallbacks
                 JSONNode randomHurdles = node[3];
 
                 List<RacePlayer> players = new();
-                for (int i = 0; i < randomAcceleration.Count; i++)
+                /*for (int i = 0; i < randomAcceleration.Count; i++)
                 {
                     List<float> playerHurdles = new();
                     for (int j = 0; j < randomHurdles[i].Count; j++)
@@ -211,19 +212,41 @@ public class Race : MonoBehaviourPunCallbacks
                         hurdles = playerHurdles
                     };
                     players.Add(player);
-                }
+                }*/
+                for (int i = 0; i < randomAcceleration.Count; i++)
+                {
+                    List<float> playerHurdles = new();
+                    for (int j = 0; j < randomHurdles[i].Count; j++)
+                    {
+                        playerHurdles.Add(int.Parse(randomHurdles[i][j].Value) / 100);
+                    }
 
-                //Need to take horseId
-                /*public int horseId;
-                public int horseSpeed;
-                acceleration*/
+                    RacePlayer player = new()
+                    {
+                        acceleration = int.Parse(randomAcceleration[i].Value) / 100,
+                        hurdles = playerHurdles
+                    };
+                    players.Add(player);
+                }
                 WalletManager.Instance.racePlayer = players;
+/*               WalletManager.Instance._horseSpeed = players;
+                WalletManager.Instance._acceleration = ;*/
                 WalletManager.Instance.raceId = raceId;
-                WalletManager.Instance._canSwitch = true;
-                WalletManager.Instance.RPCToggleSwitch();
+                Debug.LogError("Waiting for 5 sec");
+                yield return new WaitUntil(() => PhotonNetwork.InRoom);
+                if (PhotonNetwork.InRoom)
+                {
+                    WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCToggleSwitch(data);
+                    StartCoroutine(WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().InitSceneSwitchRPC());
+                }
+                else
+                {
+                    Debug.LogError("Not In room");
+                }
             }
         }
     }
+
     private void JoinArena()
     {
         Debug.LogError($"JoinArena");
