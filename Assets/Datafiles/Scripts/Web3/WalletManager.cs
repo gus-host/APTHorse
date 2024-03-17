@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Aptos.HdWallet;
 using Aptos.Unity.Rest;
@@ -15,17 +16,28 @@ public struct JoinedRaceInfo
     public int horseSpeed;
 }
 
-public struct RacePlayer
+[Serializable]
+public class RacePlayer : ISerializationCallbackReceiver
 {
     public JoinedRaceInfo joinedRaceInfo;
     public float acceleration;
     public List<float> hurdles;
+
+    public void OnAfterDeserialize()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnBeforeSerialize()
+    {
+        throw new NotImplementedException();
+    }
 }
 
 public class WalletManager : MonoBehaviourPunCallbacks
 {
     public static WalletManager Instance { get; private set; }
-
+    public GameObject _serverInstance;
     //DEV USE ONLY - InstanceID
     public bool devMode = false;
     public TMP_Dropdown instanceId;
@@ -39,12 +51,16 @@ public class WalletManager : MonoBehaviourPunCallbacks
     public PvPPhotonLobbyManager serverManager;
     public List<RacePlayer> racePlayer = new();
     public int raceId;
+    public int spawnAt;
+    public int horseID;
+    public int _horseSpeed;
+    public int _acceleration;
 
     [HideInInspector] public Wallet Wallet = null;
     [HideInInspector] public float APTBalance;
     [HideInInspector] public string Username = "";
     [HideInInspector] public string Address = "";
-    [HideInInspector] public int EquippedHorseId = 1000;
+    public int EquippedHorseId = 1000;
     [HideInInspector] public Dictionary<int, JoinedRaceInfo> joinedRaceInfos = new();
 
     public bool _canSwitch = false;
@@ -68,9 +84,6 @@ public class WalletManager : MonoBehaviourPunCallbacks
         PlayerPrefs.DeleteKey("PlayerId3");
         PlayerPrefs.DeleteKey("PlayerId4");
 
-
-
-
         if (devMode) DevPanel.SetActive(true);
         AptosUILink.Instance.onGetBalance += val =>
         {
@@ -80,6 +93,15 @@ public class WalletManager : MonoBehaviourPunCallbacks
             if (bal < 10) StartCoroutine(AptosUILink.Instance.AirDrop(1000000000));
         };
         RestClient.Instance.SetEndPoint(Constants.RANDOMNET_BASE_URL);
+    }
+
+    private void Update()
+    {
+        if (PhotonNetwork.InRoom && _serverInstance == null)
+        {
+            Debug.LogError("Spawning server instance");
+            SpawnServerInstance();
+        }
     }
 
     public bool AuthenticateWithWallet()
@@ -132,59 +154,48 @@ public class WalletManager : MonoBehaviourPunCallbacks
     public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
     {
         base.OnPlayerEnteredRoom(newPlayer);
+
         _currentRoomName.text = "Room name:- " + PhotonNetwork.CurrentRoom.Name + " " + PhotonNetwork.CurrentRoom.PlayerCount + "/" + PhotonNetwork.CurrentRoom.MaxPlayers;
         Debug.LogError("Assigning");
-        int i = 0;
-        PlayerPrefs.SetInt("Devmode", i = devMode ? 1 : 0);
-        if (devMode)
+
+        //RPCGenerateSpawnPoints();
+    }
+
+    public void SpawnServerInstance()
+    {
+       _serverInstance = PhotonNetwork.Instantiate("ServerInstance", new Vector3(0, 0, 0), Quaternion.identity);
+    }
+    
+    private void RPCGenerateSpawnPoints()
+    {
+        photonView.RPC("GenerateSpawnPoints", RpcTarget.AllBufferedViaServer);
+    }
+
+    [PunRPC]
+    public void GenerateSpawnPoints()
+    {
+/*        Debug.LogError("GenerateSpawnPoints");
+        if (racePlayer.Count > 1)
         {
-            string key = "PlayerId" + instanceId.value;
-            PlayerPrefs.SetInt(key, PhotonNetwork.CurrentRoom.PlayerCount-1);
-        }else if (!devMode)
+            Debug.LogError($"Player count {racePlayer.Count}");
+        }else if (racePlayer.Count<1)
         {
-            PlayerPrefs.SetInt("PlayerId", PhotonNetwork.CurrentRoom.PlayerCount-1);
+            Debug.LogError($"Player count 0");
         }
-        Debug.LogError($"PlayerId {PlayerPrefs.GetInt("PlayerId")}");
-        if(PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers && _canSwitch)
+        for (int index = 0; index < racePlayer.Count; index++)
         {
-            InitSceneSwitchRPC();
-        }
+            Debug.LogError("GenerateSpawnPoints");
+            if (racePlayer[index].joinedRaceInfo.playerName == PhotonNetwork.NickName)
+            {
+                spawnAt = index; //i-th spot
+            }
+        }*/
     }
 
     public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
     {
         base.OnPlayerLeftRoom(otherPlayer);
         _currentRoomName.text = "Room name:- " + PhotonNetwork.CurrentRoom.Name + " " + PhotonNetwork.CurrentRoom.PlayerCount + "/" + PhotonNetwork.CurrentRoom.MaxPlayers;
-    }
-
-    internal void InitSceneSwitchRPC()
-    {
-        Debug.LogError("InitSceneSwitch");
-        photonView.RPC("SwitchToRace", RpcTarget.AllBufferedViaServer);
-    }
-
-    public void RPCToggleSwitch()
-    {
-        Debug.LogError("RPCToggleSwitch");
-        photonView.RPC("ToggleSwitch", RpcTarget.AllBufferedViaServer);
-    }
-
-    [PunRPC]
-    public void ToggleSwitch()
-    {
-        _canSwitch = true;
-    }
-
-
-    [PunRPC]
-    private void SwitchToRace()
-    {
-        //We will store the variables
-        Debug.LogError("Loading scene");
-        if (PhotonNetwork.IsMasterClient)
-        {
-            PhotonNetwork.LoadLevel("HorseJockey");
-        }
     }
 
     internal void SaveHorseId(int val)

@@ -102,8 +102,6 @@ public class MultiplayerPlayerSpawner : MonoBehaviourPunCallbacks
                     spawnPointIndex = PlayerPrefs.GetInt(keyFour);
                     PlayerPrefs.DeleteKey(keyFour);
                 }
-                
-
             }
 /*            for (int i = 1; i < 5; i++) // Start from index 2 as per your custom properties
             {
@@ -126,7 +124,7 @@ public class MultiplayerPlayerSpawner : MonoBehaviourPunCallbacks
         }
 
         // Spawn the player across the network.
-        var player = PhotonNetwork.Instantiate(_playerPrefab[spawnPointIndex].name, _spawnPoints[spawnPointIndex].transform.position, Quaternion.identity);
+        var player = PhotonNetwork.Instantiate(_playerPrefab[WalletManager.Instance.EquippedHorseId].name, _spawnPoints[spawnPointIndex].transform.position, Quaternion.identity);
 
         HorseController _horseController = player.GetComponent<HorseController>();
 
