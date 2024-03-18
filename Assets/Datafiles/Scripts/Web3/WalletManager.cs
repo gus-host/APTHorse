@@ -122,7 +122,7 @@ public class WalletManager : MonoBehaviourPunCallbacks
          
         Wallet = new Wallet(mneomicsKey);
         Address = AptosUILink.Instance.GetCurrentWalletAddress();
-        AptosAddress.text = $"Address : {Address}";
+        AptosAddress.text = $"{Address}";
 
         return true;
     }
