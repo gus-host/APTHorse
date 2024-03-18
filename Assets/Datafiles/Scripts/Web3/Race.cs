@@ -26,6 +26,7 @@ public class Race : MonoBehaviourPunCallbacks
     private int racePrice;
     private int raceLaps;
     private bool inRace = false;
+    private bool playerJoined = false;
     private SpinnerManager spinnerManager;
 
     void Start()
@@ -52,7 +53,11 @@ public class Race : MonoBehaviourPunCallbacks
 
         for (int i = 0; i < players.Count; i++)
         {
-            if (players[i].Value == WalletManager.Instance.Wallet.Account.AccountAddress.ToString()) inRace = true;
+            if (players[i].Value == WalletManager.Instance.Wallet.Account.AccountAddress.ToString())
+            {
+                WalletManager.Instance.spawnAt = i;
+                inRace = true;
+            } 
         }
 
         CheckInRace();
@@ -75,6 +80,7 @@ public class Race : MonoBehaviourPunCallbacks
         }
 
         spinnerManager.HideMessage();
+        playerJoined = true;
     }
 
     private void LockOtherRaces(bool disableOthers)
@@ -144,13 +150,13 @@ public class Race : MonoBehaviourPunCallbacks
 
         if (responseInfo.status == ResponseInfo.Status.Success)
         {
-            WalletManager.Instance.joinedRaceInfos.Add((int)raceId, new JoinedRaceInfo
+            WalletManager.Instance.joinedRaceInfos = new JoinedRaceInfo
             {
                 playerAddress = WalletManager.Instance.Address,
                 playerName = WalletManager.Instance.Username,
                 horseId = WalletManager.Instance.EquippedHorseId,
                 horseSpeed = FindObjectOfType<MarketplaceManager>().GetHorseSpeedById(WalletManager.Instance.EquippedHorseId)
-            });
+            };
             JoinArena();
             yield return StartCoroutine(CanStartRace());
             yield return StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
@@ -198,21 +204,6 @@ public class Race : MonoBehaviourPunCallbacks
                 JSONNode randomHurdles = node[3];
 
                 List<RacePlayer> players = new();
-                /*for (int i = 0; i < randomAcceleration.Count; i++)
-                {
-                    List<float> playerHurdles = new();
-                    for (int j = 0; j < randomHurdles[i].Count; j++)
-                    {
-                        playerHurdles.Add(randomHurdles[i][j] / 100);
-                    }
-
-                    RacePlayer player = new()
-                    {
-                        acceleration = randomAcceleration[0] / 100,
-                        hurdles = playerHurdles
-                    };
-                    players.Add(player);
-                }*/
                 for (int i = 0; i < randomAcceleration.Count; i++)
                 {
                     List<float> playerHurdles = new();
@@ -228,21 +219,20 @@ public class Race : MonoBehaviourPunCallbacks
                     };
                     players.Add(player);
                 }
-                WalletManager.Instance.racePlayer = players;
-/*               WalletManager.Instance._horseSpeed = players;
-                WalletManager.Instance._acceleration = ;*/
-                WalletManager.Instance.raceId = raceId;
                 Debug.LogError("Waiting for 5 sec");
                 yield return new WaitUntil(() => PhotonNetwork.InRoom);
-                if (PhotonNetwork.InRoom)
+                if (PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
                 {
-                    WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCToggleSwitch(data);
-                    WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCGenerateSpawnPoints();
-                    StartCoroutine(WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().InitSceneSwitchRPC());
+                    WalletManager.Instance.raceId = raceId;
+                    Debug.LogError("Multiplayer logic 1");
+                    WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCRaceData(data);
+                    Debug.LogError("Multiplayer logic 2");
+                    yield return new WaitUntil(() => playerJoined);
+                    StartCoroutine(WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCInitSceneSwitch());
                 }
                 else
                 {
-                    Debug.LogError("Not In room");
+                    Debug.LogError("Not In room or Room not full");
                 }
             }
         }
@@ -306,7 +296,7 @@ public class Race : MonoBehaviourPunCallbacks
         Debug.Log(responseInfo.status);
         if (responseInfo.status == ResponseInfo.Status.Success)
         {
-            WalletManager.Instance.joinedRaceInfos.Remove((int)raceId);
+            WalletManager.Instance.joinedRaceInfos = new();
             StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
             if (PhotonNetwork.InRoom)
             {

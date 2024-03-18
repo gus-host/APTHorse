@@ -41,6 +41,7 @@ public class WalletManager : MonoBehaviourPunCallbacks
     public GameObject _serverInstance;
     //DEV USE ONLY - InstanceID
     public bool devMode = false;
+    public bool generatedSpawnPoint = false;
     public TMP_Dropdown instanceId;
     [SerializeField] private GameObject DevPanel;
 
@@ -65,7 +66,7 @@ public class WalletManager : MonoBehaviourPunCallbacks
    /* [HideInInspector] */
     public string Address = "";
     public int EquippedHorseId = 1000;
-    [HideInInspector] public Dictionary<int, JoinedRaceInfo> joinedRaceInfos = new();
+    public JoinedRaceInfo joinedRaceInfos = new();
 
     public bool _canSwitch = false;
 
@@ -165,30 +166,7 @@ public class WalletManager : MonoBehaviourPunCallbacks
 
     public void SpawnServerInstance()
     {
-       _serverInstance = PhotonNetwork.Instantiate("ServerInstance", new Vector3(0, 0, 0), Quaternion.identity);
-    }
-
-    public int GenerateSpawnPoints()
-    {
-        Debug.LogError("GenerateSpawnPoints");
-        if (racePlayer.Count > 1)
-        {
-            Debug.LogError($"Player count {racePlayer.Count}");
-        }
-        else if (racePlayer.Count < 1)
-        {
-            Debug.LogError($"Player count 0");
-        }
-        for (int index = 0; index < racePlayer.Count; index++)
-        {
-            Debug.LogError($"GenerateSpawnPoints playername {racePlayer[index].joinedRaceInfo.playerName} photon nickname {PhotonNetwork.NickName}");
-            if (racePlayer[index].joinedRaceInfo.playerName == PhotonNetwork.NickName)
-            {
-                Debug.LogError($"Generated SpawnPoints {index}");
-                return index; //i-th spot
-            }
-        }
-        return 0;
+        _serverInstance = PhotonNetwork.Instantiate("ServerInstance", new Vector3(0, 0, 0), Quaternion.identity);
     }
 
     public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)

@@ -8,35 +8,39 @@ public class ServerInstance : MonoBehaviourPunCallbacks
 {
     
     public static ServerInstance Instance;
-
+    public int spawnPoint;
+    private SpinnerManager spinnner;
     private void Start()
     {
         Instance = this;
+        spinnner = FindObjectOfType<SpinnerManager>();
     }
-    public IEnumerator InitSceneSwitchRPC()
+    public IEnumerator RPCInitSceneSwitch()
     {
         if(!PhotonNetwork.InRoom)
         {
             Debug.LogError("Not in room");
-            yield return null;
+            yield return null; 
         }
-        yield return new WaitForSeconds(5f);
+        spinnner.ShowMessage("Loading race");
         Debug.LogError("InitSceneSwitch");
-        photonView.RPC("SwitchToRace", RpcTarget.AllBufferedViaServer);
+        Debug.LogError("InitSceneSwitch");
+        photonView.RPC("SwitchToRace", RpcTarget.All);
+        yield return null; 
     }
 
     [PunRPC]
     private void SwitchToRace()
     {
         //We will store the variables
-        Debug.LogError("Loading scene");
-        if (PhotonNetwork.IsMasterClient)
+        if(PhotonNetwork.IsMasterClient)
         {
+            Debug.LogError($"Is master client loaded scene {PhotonNetwork.IsMasterClient}");
             PhotonNetwork.LoadLevel("HorseJockey");
         }
     }
 
-    public void RPCToggleSwitch(string data)
+    public void RPCRaceData(string data)
     {
         if (!PhotonNetwork.InRoom)
         {
@@ -75,23 +79,9 @@ public class ServerInstance : MonoBehaviourPunCallbacks
         for (int i = 0; i< players.Count; i++)
         {
             Debug.LogError($"acceleration {players[i].acceleration}");
-            Debug.LogError($"randomAcceleration {randomAcceleration[i].AsInt}");
-            Debug.LogError($"randomAcceleration Parse {int.Parse(randomAcceleration[i].Value)}");
-            Debug.LogError($"hurdles {players[i].hurdles}");
+            //Debug.LogError($"randomAcceleration {randomAcceleration[i].AsInt}");
+            //Debug.LogError($"randomAcceleration Parse {int.Parse(randomAcceleration[i].Value)}");
+            //Debug.LogError($"hurdles {players[i].hurdles}");
         }
-    }
-
-
-    public void RPCGenerateSpawnPoints()
-    {
-        photonView.RPC("GenerateSpawnPoints", RpcTarget.AllBufferedViaServer);
-    }
-
-    [PunRPC]
-    public void GenerateSpawnPoints()
-    {
-        Debug.LogError("RPC Generating SpawnPoint");
-        int spawnPoint = WalletManager.Instance.GenerateSpawnPoints();
-        Debug.LogError($"RPC Generated SpawnPoint {spawnPoint}");
     }
 }
