@@ -82,7 +82,7 @@ public class ServerInstance : MonoBehaviourPunCallbacks
     }
 
 
-/*    private void RPCGenerateSpawnPoints()
+    public void RPCGenerateSpawnPoints()
     {
         photonView.RPC("GenerateSpawnPoints", RpcTarget.AllBufferedViaServer);
     }
@@ -90,22 +90,8 @@ public class ServerInstance : MonoBehaviourPunCallbacks
     [PunRPC]
     public void GenerateSpawnPoints()
     {
-        Debug.LogError("GenerateSpawnPoints");
-        if (racePlayer.Count > 1)
-        {
-            Debug.LogError($"Player count {racePlayer.Count}");
-        }
-        else if (racePlayer.Count < 1)
-        {
-            Debug.LogError($"Player count 0");
-        }
-        for (int index = 0; index < racePlayer.Count; index++)
-        {
-            Debug.LogError("GenerateSpawnPoints");
-            if (racePlayer[index].joinedRaceInfo.playerName == PhotonNetwork.NickName)
-            {
-                spawnAt = index; //i-th spot
-            }
-        }
-    }*/
+        Debug.LogError("RPC Generating SpawnPoint");
+        int spawnPoint = WalletManager.Instance.GenerateSpawnPoints();
+        Debug.LogError($"RPC Generated SpawnPoint {spawnPoint}");
+    }
 }

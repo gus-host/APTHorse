@@ -8,7 +8,8 @@ using Photon.Pun;
 using TMPro;
 using UnityEngine;
 
-public struct JoinedRaceInfo
+[Serializable]
+public class JoinedRaceInfo
 {
     public string playerAddress;
     public string playerName;
@@ -58,8 +59,11 @@ public class WalletManager : MonoBehaviourPunCallbacks
 
     [HideInInspector] public Wallet Wallet = null;
     [HideInInspector] public float APTBalance;
-    [HideInInspector] public string Username = "";
-    [HideInInspector] public string Address = "";
+    /*[HideInInspector] */
+    public string Username = "";
+    
+   /* [HideInInspector] */
+    public string Address = "";
     public int EquippedHorseId = 1000;
     [HideInInspector] public Dictionary<int, JoinedRaceInfo> joinedRaceInfos = new();
 
@@ -157,39 +161,34 @@ public class WalletManager : MonoBehaviourPunCallbacks
 
         _currentRoomName.text = "Room name:- " + PhotonNetwork.CurrentRoom.Name + " " + PhotonNetwork.CurrentRoom.PlayerCount + "/" + PhotonNetwork.CurrentRoom.MaxPlayers;
         Debug.LogError("Assigning");
-
-        //RPCGenerateSpawnPoints();
     }
 
     public void SpawnServerInstance()
     {
        _serverInstance = PhotonNetwork.Instantiate("ServerInstance", new Vector3(0, 0, 0), Quaternion.identity);
     }
-    
-    private void RPCGenerateSpawnPoints()
-    {
-        photonView.RPC("GenerateSpawnPoints", RpcTarget.AllBufferedViaServer);
-    }
 
-    [PunRPC]
-    public void GenerateSpawnPoints()
+    public int GenerateSpawnPoints()
     {
-/*        Debug.LogError("GenerateSpawnPoints");
+        Debug.LogError("GenerateSpawnPoints");
         if (racePlayer.Count > 1)
         {
             Debug.LogError($"Player count {racePlayer.Count}");
-        }else if (racePlayer.Count<1)
+        }
+        else if (racePlayer.Count < 1)
         {
             Debug.LogError($"Player count 0");
         }
         for (int index = 0; index < racePlayer.Count; index++)
         {
-            Debug.LogError("GenerateSpawnPoints");
+            Debug.LogError($"GenerateSpawnPoints playername {racePlayer[index].joinedRaceInfo.playerName} photon nickname {PhotonNetwork.NickName}");
             if (racePlayer[index].joinedRaceInfo.playerName == PhotonNetwork.NickName)
             {
-                spawnAt = index; //i-th spot
+                Debug.LogError($"Generated SpawnPoints {index}");
+                return index; //i-th spot
             }
-        }*/
+        }
+        return 0;
     }
 
     public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)

@@ -237,6 +237,7 @@ public class Race : MonoBehaviourPunCallbacks
                 if (PhotonNetwork.InRoom)
                 {
                     WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCToggleSwitch(data);
+                    WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCGenerateSpawnPoints();
                     StartCoroutine(WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().InitSceneSwitchRPC());
                 }
                 else
