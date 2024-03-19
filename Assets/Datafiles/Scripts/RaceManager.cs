@@ -3,6 +3,7 @@
 
 using Photon.Pun;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -25,11 +26,16 @@ public class RaceManager : MonoBehaviourPunCallbacks
     public Transform _content;
     public PlayerItem playerItem;
 
+   /* public List<float> acceleration = new List<float>();
+    public List<int> speed = new List<int>();
+    public List<string>  address= new List<string>();*/
 
     public int jockeyId;
     public int totalLap;
+
+    public bool addedAllJockeys = false;
     
-    public HorseController[] jockeys;
+    public HorseController[] jockeys = new HorseController[5];
     public int jockeysIndex = 0;
     public List<HorseController> _horseRanks = new List<HorseController>();
     static Action UpdateAtt;
@@ -73,10 +79,7 @@ public class RaceManager : MonoBehaviourPunCallbacks
             Bet();
         }
         );
-        _start.onClick.AddListener(() =>
-        {
-            photonView.RPC("StartRace", RpcTarget.AllBuffered);
-        });
+        StartCoroutine(AssignValues());
     }
 
 
@@ -85,26 +88,59 @@ public class RaceManager : MonoBehaviourPunCallbacks
         jockeys[jockeysIndex++] = _horse;
     }
 
-
-    [PunRPC]
-    private void StartRace()
+    private IEnumerator AssignValues()
     {
-        //Generate random values like minimum speed and acceleration
-        GenerateRandomValues();
-
-        //Assign these values to all other horses across all clients
+        Debug.LogError("Assigning values to each horse");
+        yield return new WaitUntil(() => addedAllJockeys);
         if (PhotonNetwork.IsMasterClient)
         {
+            if(WalletManager.Instance.raceId == 0)
+            {
+                totalLap = 1;
+            }else if(WalletManager.Instance.raceId == 1)
+            {
+                totalLap = 3;
+            }else if(WalletManager.Instance.raceId == 2)
+            {
+                totalLap = 5;
+            }
             for (int i = 0; i< jockeys.Length; i++)
             {
-                photonView.RPC("SyncJockeyValues", RpcTarget.All,i , jockeys[i]._maxSpeed, jockeys[i]._minSpeed, jockeys[i]._acceleration, jockeys[i].totalLap, jockeys[i].lapLeft, jockeys[i]._lastLap);
+                if(jockeys[i] != null)
+                {
+                    Debug.LogError($"Assigning valuesto horse {jockeys[i].name}");
+                    int maxSpeed = WalletManager.Instance.horsesMaxSpeed[i];
+                    float acceleration = WalletManager.Instance.acceleration[i];
+                    jockeys[i].RPCAssign(maxSpeed,
+                    0,
+                    acceleration,
+                    totalLap,
+                    totalLap,
+                    true);
+                }
+                else
+                {
+                    Debug.LogError($"Horse is null");
+                }
             }
-            // Synchronize random values with other clients
         }
 
-        CallDisableBetPanelRPC();
+        //CallDisableBetPanelRPC();
+
+        StartRace();
+        
+        yield return null;
     }
 
+    private void StartRace()
+    {
+        foreach (var horse in jockeys)
+        {
+            horse.StartRace();
+        }
+    }
+
+    //Everyone will generate random values but the ones host generated will be asigned to all at line 96
     private void GenerateRandomValues()
     {
         foreach (var jockey in jockeys)
@@ -120,6 +156,7 @@ public class RaceManager : MonoBehaviourPunCallbacks
             }
         }
     }
+
     [PunRPC]
     private void SyncJockeyValues(int jockeyIndex, float maxSpeed, float minSpeed, float acceleration, int totalLap, int lapLeft, bool lastLap)
     {
@@ -132,7 +169,7 @@ public class RaceManager : MonoBehaviourPunCallbacks
         {
             jockeys[jockeyIndex]._lastLap = lastLap;
         }
-        jockeys[jockeyIndex].StartRace();
+        //jockeys[jockeyIndex].StartRace();
     }
 
     [PunRPC]

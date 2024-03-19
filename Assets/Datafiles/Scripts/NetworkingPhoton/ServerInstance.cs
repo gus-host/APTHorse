@@ -13,6 +13,7 @@ public class ServerInstance : MonoBehaviourPunCallbacks
     private void Start()
     {
         Instance = this;
+        DontDestroyOnLoad(gameObject);
         spinnner = FindObjectOfType<SpinnerManager>();
     }
     public IEnumerator RPCInitSceneSwitch()
@@ -24,7 +25,7 @@ public class ServerInstance : MonoBehaviourPunCallbacks
         }
         spinnner.ShowMessage("Loading race");
         Debug.LogError("InitSceneSwitch");
-        Debug.LogError("InitSceneSwitch");
+       
         photonView.RPC("SwitchToRace", RpcTarget.All);
         yield return null; 
     }
@@ -78,10 +79,34 @@ public class ServerInstance : MonoBehaviourPunCallbacks
         }
         for (int i = 0; i< players.Count; i++)
         {
+
             Debug.LogError($"acceleration {players[i].acceleration}");
-            //Debug.LogError($"randomAcceleration {randomAcceleration[i].AsInt}");
-            //Debug.LogError($"randomAcceleration Parse {int.Parse(randomAcceleration[i].Value)}");
-            //Debug.LogError($"hurdles {players[i].hurdles}");
+            WalletManager.Instance.acceleration.Add(players[i].acceleration);
+        }
+    }
+
+    internal void RPCSendEssesData(int spawnAt, string playerAddress, int horseSpeed)
+    {
+        Debug.LogError($" RPCSendEssesData spawnAt {spawnAt} address {playerAddress} horseSpeed {horseSpeed}");
+        photonView.RPC("SendEssesData", RpcTarget.AllBufferedViaServer, spawnAt, playerAddress, horseSpeed);
+    }
+
+    [PunRPC]
+    public void SendEssesData(int spawnAt, string playerAddress, int horseSpeed)
+    {
+        if(PhotonNetwork.IsMasterClient)
+        {
+            Debug.LogError($" SendEssesData SpawnAt {spawnAt} Address {playerAddress} HorseSpeed {horseSpeed}");
+            WalletManager.Instance.AddAddress(spawnAt, playerAddress);
+            WalletManager.Instance.AddSpeed(spawnAt, horseSpeed);
+            if(spawnAt == 4)
+            {
+                Race[] _race = FindObjectsOfType<Race>();
+                foreach(Race race in _race)
+                {
+                    race._addedLastInfo = true;
+                }
+            }
         }
     }
 }

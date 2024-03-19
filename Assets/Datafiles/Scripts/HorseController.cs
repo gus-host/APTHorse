@@ -42,7 +42,7 @@ public class HorseController : MonoBehaviourPunCallbacks
 
     //4-6
     public float _maxSpeed = 5f;
-    public float _minSpeed = 2f;
+    public float _minSpeed = 0;
     //0.1-1 is normal
     public float _acceleration = 2f;
     public float currentSpeed = 0;
@@ -83,6 +83,10 @@ public class HorseController : MonoBehaviourPunCallbacks
         if (raceManager.jockeys.Length <=5)
         {
             raceManager.AddHorse(this);
+            if (raceManager.jockeys[4] != null)
+            {
+                raceManager.addedAllJockeys = true;
+            }
         }
         else
         {
@@ -475,6 +479,22 @@ public class HorseController : MonoBehaviourPunCallbacks
     private IEnumerator DelayLastLap(bool lastLap)
     {
         yield return new WaitForSeconds(1.5f);
+        _lastLap = lastLap;
+    }
+
+    public void RPCAssign(int speed, float minSpeed, float acceleration, int totalLap, int lapLeft, bool lastLap)
+    {
+        photonView.RPC("AssignVal", RpcTarget.AllBufferedViaServer ,speed, minSpeed, acceleration, totalLap, lapLeft, lastLap);
+    }
+
+    [PunRPC]
+    public void AssignVal(int speed, float minSpeed, float acceleration, int _totalLap, int _lapLeft, bool lastLap)
+    {
+        _maxSpeed = speed;
+        _minSpeed = minSpeed;
+        _acceleration = acceleration;
+        totalLap = _totalLap;
+        _lapLeft = lapLeft;
         _lastLap = lastLap;
     }
 }

@@ -56,14 +56,15 @@ public class WalletManager : MonoBehaviourPunCallbacks
     public int spawnAt;
     public int horseID;
     public int _horseSpeed;
-    public int _acceleration;
+    public float _acceleration;
+
+    public List<float> acceleration = new List<float>();
+    public int[] horsesMaxSpeed = new int[5];
+    public string[] address = new string[5];
 
     [HideInInspector] public Wallet Wallet = null;
     [HideInInspector] public float APTBalance;
-    /*[HideInInspector] */
     public string Username = "";
-    
-   /* [HideInInspector] */
     public string Address = "";
     public int EquippedHorseId = 1000;
     public JoinedRaceInfo joinedRaceInfos = new();
@@ -178,5 +179,27 @@ public class WalletManager : MonoBehaviourPunCallbacks
     internal void SaveHorseId(int val)
     {
         PlayerPrefs.SetInt("HorseId", val);
+    }
+
+    public void AddAddress(int index, string val)
+    {
+        for(int ind = 0; ind < address.Length; ind++)
+        {
+            if(ind == index)
+            {
+                address[ind] = val;
+            }
+        }
+    }
+
+    public void AddSpeed(int index, int val)
+    {
+        for (int ind = 0; ind < horsesMaxSpeed.Length; ind++)
+        {
+            if (ind == index)
+            {
+                horsesMaxSpeed[ind] = val;
+            }
+        }
     }
 }

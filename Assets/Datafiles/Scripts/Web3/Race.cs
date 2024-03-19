@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Aptos.Accounts;
 using Aptos.BCS;
+using Aptos.HdWallet;
 using Aptos.HdWallet.Utils;
 using Aptos.Unity.Rest;
 using Aptos.Unity.Rest.Model;
@@ -27,6 +28,8 @@ public class Race : MonoBehaviourPunCallbacks
     private int raceLaps;
     private bool inRace = false;
     private bool playerJoined = false;
+    public bool _addedLastInfo = false;
+
     private SpinnerManager spinnerManager;
 
     void Start()
@@ -160,6 +163,12 @@ public class Race : MonoBehaviourPunCallbacks
             JoinArena();
             yield return StartCoroutine(CanStartRace());
             yield return StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
+
+            //Send Important data
+            WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCSendEssesData(
+                WalletManager.Instance.spawnAt,
+                WalletManager.Instance.joinedRaceInfos.playerAddress,
+                WalletManager.Instance.joinedRaceInfos.horseSpeed);
         }
         else
         {
@@ -225,9 +234,18 @@ public class Race : MonoBehaviourPunCallbacks
                 {
                     WalletManager.Instance.raceId = raceId;
                     Debug.LogError("Multiplayer logic 1");
+
+                    //Send acceleration and hurdles data over network
                     WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCRaceData(data);
                     Debug.LogError("Multiplayer logic 2");
+
+                    //Wait until player check ins
                     yield return new WaitUntil(() => playerJoined);
+
+                    //store local acceleration
+                    WalletManager.Instance._acceleration = players[WalletManager.Instance.spawnAt].acceleration;
+
+                    //Switch scene
                     StartCoroutine(WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCInitSceneSwitch());
                 }
                 else

@@ -1061,6 +1061,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _serverInstance: {fileID: 0}
   devMode: 1
+  generatedSpawnPoint: 0
   instanceId: {fileID: 1141531793}
   DevPanel: {fileID: 306100766}
   AptosTokenBalance: {fileID: 870999713}
@@ -1074,10 +1075,23 @@ MonoBehaviour:
   horseID: 0
   _horseSpeed: 0
   _acceleration: 0
+  acceleration: []
+  horsesMaxSpeed: 0000000000000000000000000000000000000000
+  address:
+  - 
+  - 
+  - 
+  - 
+  - 
   APTBalance: 0
   Username: 
   Address: 
   EquippedHorseId: 1000
+  joinedRaceInfos:
+    playerAddress: 
+    playerName: 
+    horseId: 0
+    horseSpeed: 0
   _canSwitch: 0
 --- !u!4 &227476187
 Transform:
