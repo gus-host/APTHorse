@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Aptos.Accounts;
 using Aptos.BCS;
 using Aptos.HdWallet;
@@ -29,6 +30,7 @@ public class Race : MonoBehaviourPunCallbacks
     private bool inRace = false;
     private bool playerJoined = false;
     public bool _addedLastInfo = false;
+    public bool _createdServerInstance = false;
 
     private SpinnerManager spinnerManager;
 
@@ -163,12 +165,10 @@ public class Race : MonoBehaviourPunCallbacks
             JoinArena();
             yield return StartCoroutine(CanStartRace());
             yield return StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
+            WalletManager.Instance._playerInfoAdded = true;                  
 
             //Send Important data
-            WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCSendEssesData(
-                WalletManager.Instance.spawnAt,
-                WalletManager.Instance.joinedRaceInfos.playerAddress,
-                WalletManager.Instance.joinedRaceInfos.horseSpeed);
+            //SendEssensData();
         }
         else
         {
@@ -177,6 +177,14 @@ public class Race : MonoBehaviourPunCallbacks
         } 
         yield return new WaitForSeconds(1);
         AptosUILink.Instance.LoadCurrentWalletBalance();
+    }
+
+    private void SendEssensData()
+    {
+        WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCSendEssesData(
+                    WalletManager.Instance.spawnAt,
+                    WalletManager.Instance.joinedRaceInfos.playerAddress,
+                    WalletManager.Instance.joinedRaceInfos.horseSpeed);
     }
 
     private IEnumerator CanStartRace()
@@ -232,7 +240,7 @@ public class Race : MonoBehaviourPunCallbacks
                 yield return new WaitUntil(() => PhotonNetwork.InRoom);
                 if (PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
                 {
-                    WalletManager.Instance.raceId = raceId;
+                    
                     Debug.LogError("Multiplayer logic 1");
 
                     //Send acceleration and hurdles data over network
@@ -260,6 +268,7 @@ public class Race : MonoBehaviourPunCallbacks
     {
         Debug.LogError($"JoinArena");
         Debug.LogError($"Race Id {raceId} && {PhotonNetwork.Server}");
+        WalletManager.Instance.raceId = (int)this.raceId;
         RoomOptions roomOptions = new RoomOptions() { MaxPlayers = 5, IsOpen = true, IsVisible = true };
         PhotonNetwork.JoinOrCreateRoom(raceId.ToString(), roomOptions, null);
     }

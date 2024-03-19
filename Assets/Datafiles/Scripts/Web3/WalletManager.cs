@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Aptos.HdWallet;
 using Aptos.Unity.Rest;
 using Aptos.Unity.Sample.UI;
@@ -70,6 +71,8 @@ public class WalletManager : MonoBehaviourPunCallbacks
     public JoinedRaceInfo joinedRaceInfos = new();
 
     public bool _canSwitch = false;
+    public bool _createdServerInstance = false;
+    public bool _playerInfoAdded = false;
 
     void Awake()
     {
@@ -99,6 +102,7 @@ public class WalletManager : MonoBehaviourPunCallbacks
             if (bal < 10) StartCoroutine(AptosUILink.Instance.AirDrop(1000000000));
         };
         RestClient.Instance.SetEndPoint(Constants.RANDOMNET_BASE_URL);
+        ThreadPool.QueueUserWorkItem(new WaitCallback(SpawnServerInstance));
     }
 
     private void Update()
@@ -107,6 +111,15 @@ public class WalletManager : MonoBehaviourPunCallbacks
         {
             Debug.LogError("Spawning server instance");
             SpawnServerInstance();
+        }
+
+        if (_serverInstance != null)
+        {
+            Race[] _races = FindObjectsOfType<Race>();
+            foreach (var race in _races)
+            {
+                race._createdServerInstance = _createdServerInstance;
+            }
         }
     }
 
@@ -162,12 +175,32 @@ public class WalletManager : MonoBehaviourPunCallbacks
         base.OnPlayerEnteredRoom(newPlayer);
 
         _currentRoomName.text = "Room name:- " + PhotonNetwork.CurrentRoom.Name + " " + PhotonNetwork.CurrentRoom.PlayerCount + "/" + PhotonNetwork.CurrentRoom.MaxPlayers;
+
+        if (_serverInstance == null)
+        {
+            Debug.LogError("Spawning server instance");
+            SpawnServerInstance();
+        }
+
         Debug.LogError("Assigning");
     }
 
-    public void SpawnServerInstance()
+    public void SpawnServerInstance(object state = null)
     {
         _serverInstance = PhotonNetwork.Instantiate("ServerInstance", new Vector3(0, 0, 0), Quaternion.identity);
+        StartCoroutine(SendEssensData());
+        _createdServerInstance = true;
+        Race[] _races = FindObjectsOfType<Race>();
+        foreach (var race in _races)
+        {
+            race._createdServerInstance = _createdServerInstance;
+        }
+    }
+
+    private IEnumerator SendEssensData()
+    {
+        yield return new WaitUntil(()=>_createdServerInstance && _playerInfoAdded);
+        _serverInstance.GetComponent<ServerInstance>().RPCSendEssesData(spawnAt, joinedRaceInfos.playerAddress, joinedRaceInfos.horseSpeed);
     }
 
     public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
