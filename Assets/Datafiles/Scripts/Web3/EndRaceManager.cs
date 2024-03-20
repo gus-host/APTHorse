@@ -11,10 +11,19 @@ public class EndRaceManager : MonoBehaviour
 {
     public IEnumerator OnEndRace(ulong raceId, List<BString> winningOrder)
     {
+        yield return new WaitForSeconds(5);
         ResponseInfo responseInfo = new();
-
-        byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
-        Sequence sequence = new(new ISerializable[] { new U64(raceId), new Sequence(winningOrder.ToArray()) });
+        
+        byte[] bytes = "f5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c".ByteArrayFromHexString();
+        Sequence sequence = new(new ISerializable[] 
+        { 
+            new U64(raceId), 
+            winningOrder[0], 
+            winningOrder[1], 
+            winningOrder[2], 
+            winningOrder[3], 
+            winningOrder[4] 
+        });
 
         var payload = new EntryFunction
         (
@@ -52,6 +61,7 @@ public class EndRaceManager : MonoBehaviour
         if (responseInfo.status == ResponseInfo.Status.Success)
         { 
             //Success
+            //Switch back to main scene and leave the race for all players
         }
         else Debug.Log(responseInfo.message);
     }
