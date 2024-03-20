@@ -144,7 +144,7 @@ public class RaceManager : MonoBehaviourPunCallbacks
 
                     Debug.LogError($"Assigning values to horse {jockeys[i].name} hurd1{hurd1} hurd2{hurd2} hurd3 {hurd3}");
                     
-                    int maxSpeed =Mathf.CeilToInt(WalletManager.Instance.horsesMaxSpeed[i]/2);
+                    int maxSpeed =Mathf.CeilToInt(WalletManager.Instance.horsesMaxSpeed[i]/1.5f);
                     float acceleration = WalletManager.Instance.acceleration[i];
                     string address = WalletManager.Instance.address[i];
                     jockeys[i].RPCAssign(i , maxSpeed,
