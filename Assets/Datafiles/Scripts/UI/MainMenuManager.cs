@@ -63,7 +63,7 @@ public class MainMenuManager : MonoBehaviour
             InfoPanel.SetActive(true);
             MarketplaceButton.SetActive(true);
             //RacesButton.SetActive(true);
-            StartCoroutine(FindObjectOfType<MarketplaceManager>().GetMarketplaceDataAsync());
+            yield return StartCoroutine(FindObjectOfType<MarketplaceManager>().GetMarketplaceDataAsync());
             StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
         }
     }

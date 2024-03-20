@@ -1,6 +1,7 @@
 //Race Ids denotes Room feature like 0 for 1 Lap, 1 for 3 Lap, 2 for 5 lap
 
 
+using Aptos.BCS;
 using Photon.Pun;
 using System;
 using System.Collections;
@@ -283,15 +284,17 @@ public class RaceManager : MonoBehaviourPunCallbacks
             }
             _horseRanks.Reverse();
             int rank = 1;
+            List<BString> winningOrder = new();
             foreach (var horse in _horseRanks)
             {
                 if (rank > 5) break;
 
+                winningOrder.Add(new BString(horse.playerProperties.address));
                 GameObject playerInfo = Instantiate(playerItem.gameObject, _content);
                 playerInfo.GetComponent<PlayerItem>()._playerName.text = rank.ToString() + ". " + horse.playerProperties.color.ToString();
                 rank++;
             }
-            //Distribute Prize
+            StartCoroutine(FindObjectOfType<EndRaceManager>().OnEndRace((ulong)WalletManager.Instance.raceId, winningOrder));
         }
     }
 }
