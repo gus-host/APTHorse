@@ -79,6 +79,7 @@ public class WalletManager : MonoBehaviourPunCallbacks
     public bool _canSwitch = false;
     public bool _createdServerInstance = false;
     public bool _playerInfoAdded = false;
+    public bool _inRace = false;
 
     void Awake()
     {
@@ -215,7 +216,8 @@ public class WalletManager : MonoBehaviourPunCallbacks
 
     public IEnumerator SendEssensData()
     {
-        yield return new WaitUntil(()=>_createdServerInstance);
+
+        yield return new WaitUntil(()=>_createdServerInstance && _inRace);
 
         horseSpeed = FindObjectOfType<MarketplaceManager>().GetHorseSpeedById(WalletManager.Instance.EquippedHorseId);
         
