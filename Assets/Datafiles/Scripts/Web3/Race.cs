@@ -218,12 +218,12 @@ public class Race : MonoBehaviourPunCallbacks
                     //store local acceleration
                     WalletManager.Instance._acceleration = players[WalletManager.Instance.spawnAt].acceleration;
 
-                    //Switch scene
-                    StartCoroutine(WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCInitSceneSwitch());
+                    WalletManager.Instance._blockchainRoomFull = true;
                 }
                 else
                 {
                     Debug.LogError("Not In room or Room not full");
+                    WalletManager.Instance._blockchainRoomFull = true;
                 }
             }
         }

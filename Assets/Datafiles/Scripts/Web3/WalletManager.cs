@@ -80,6 +80,7 @@ public class WalletManager : MonoBehaviourPunCallbacks
     public bool _createdServerInstance = false;
     public bool _playerInfoAdded = false;
     public bool _inRace = false;
+    public bool _blockchainRoomFull = false;
 
     void Awake()
     {
@@ -198,6 +199,19 @@ public class WalletManager : MonoBehaviourPunCallbacks
         {
             Debug.LogError("GetRaceDataAsyncNotFound");
         }
+
+        StartCoroutine(SwitchScene());
+    }
+
+    private IEnumerator SwitchScene()
+    {
+        //Switch scene
+        if(PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
+        {
+            yield return new WaitUntil(()=> _blockchainRoomFull);
+            StartCoroutine(WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCInitSceneSwitch());
+        }
+        yield return null;
     }
 
     public void SpawnServerInstance(object state = null)
