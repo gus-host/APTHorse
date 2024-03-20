@@ -126,4 +126,19 @@ public class ServerInstance : MonoBehaviourPunCallbacks
             }
         }
     }
+
+
+    public void RPCFetchRaceDataAsync(bool val)
+    {
+        photonView.RPC("FetchRaceDataAsync", RpcTarget.All, val);
+    }
+
+    [PunRPC]
+    private void FetchRaceDataAsync(bool val)
+    {
+        if (val)
+        {
+            StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
+        }
+    }
 }

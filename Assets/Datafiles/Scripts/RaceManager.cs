@@ -267,6 +267,7 @@ public class RaceManager : MonoBehaviourPunCallbacks
     {
         photonView.RPC("PrintStack", RpcTarget.All);
     }
+
     [PunRPC]
     public void PrintStack()
     {
@@ -283,6 +284,7 @@ public class RaceManager : MonoBehaviourPunCallbacks
             }
             _horseRanks.Reverse();
             int rank = 1;
+
             foreach (var horse in _horseRanks)
             {
                 if (rank > 5) break;
@@ -292,6 +294,7 @@ public class RaceManager : MonoBehaviourPunCallbacks
                 rank++;
             }
             //Distribute Prize
+
         }
     }
 }
