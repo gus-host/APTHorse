@@ -8,35 +8,40 @@ public class ServerInstance : MonoBehaviourPunCallbacks
 {
     
     public static ServerInstance Instance;
-
+    public int spawnPoint;
+    private SpinnerManager spinnner;
     private void Start()
     {
         Instance = this;
+        DontDestroyOnLoad(gameObject);
+        spinnner = FindObjectOfType<SpinnerManager>();
     }
-    public IEnumerator InitSceneSwitchRPC()
+    public IEnumerator RPCInitSceneSwitch()
     {
         if(!PhotonNetwork.InRoom)
         {
             Debug.LogError("Not in room");
-            yield return null;
+            yield return null; 
         }
-        yield return new WaitForSeconds(5f);
+        spinnner.ShowMessage("Loading race");
         Debug.LogError("InitSceneSwitch");
-        photonView.RPC("SwitchToRace", RpcTarget.AllBufferedViaServer);
+       
+        photonView.RPC("SwitchToRace", RpcTarget.All);
+        yield return null; 
     }
 
     [PunRPC]
     private void SwitchToRace()
     {
         //We will store the variables
-        Debug.LogError("Loading scene");
-        if (PhotonNetwork.IsMasterClient)
+        if(PhotonNetwork.IsMasterClient)
         {
+            Debug.LogError($"Is master client loaded scene {PhotonNetwork.IsMasterClient}");
             PhotonNetwork.LoadLevel("HorseJockey");
         }
     }
 
-    public void RPCToggleSwitch(string data)
+    public void RPCRaceData(string data)
     {
         if (!PhotonNetwork.InRoom)
         {
@@ -62,9 +67,26 @@ public class ServerInstance : MonoBehaviourPunCallbacks
             List<float> playerHurdles = new();
             for (int j = 0; j < randomHurdles[i].Count; j++)
             {
-                playerHurdles.Add(int.Parse(randomHurdles[i][j].Value) / 100);
+                playerHurdles.Add((float)int.Parse(randomHurdles[i][j].Value) / 100);
             }
-
+            if (i == 0)
+            {
+                WalletManager.Instance.playerOneHurd = playerHurdles.ToArray();
+            }else if (i==1)
+            {
+                WalletManager.Instance.playerTwoHurd = playerHurdles.ToArray();
+            }else if (i == 2)
+            {
+                WalletManager.Instance.playerThreeHurd = playerHurdles.ToArray();
+            }
+            else if (i == 3)
+            {
+                WalletManager.Instance.playerFourHurd = playerHurdles.ToArray();
+            }
+            else if (i == 4)
+            {
+                WalletManager.Instance.playerFiveHurd = playerHurdles.ToArray();
+            }
             RacePlayer player = new()
             {
                 acceleration = (float)int.Parse(randomAcceleration[i].Value) / 100,
@@ -74,38 +96,34 @@ public class ServerInstance : MonoBehaviourPunCallbacks
         }
         for (int i = 0; i< players.Count; i++)
         {
+
             Debug.LogError($"acceleration {players[i].acceleration}");
-            Debug.LogError($"randomAcceleration {randomAcceleration[i].AsInt}");
-            Debug.LogError($"randomAcceleration Parse {int.Parse(randomAcceleration[i].Value)}");
-            Debug.LogError($"hurdles {players[i].hurdles}");
+            WalletManager.Instance.acceleration.Add(players[i].acceleration);
         }
     }
 
-
-/*    private void RPCGenerateSpawnPoints()
+    internal void RPCSendEssesData(int spawnAt, string playerAddress, int horseSpeed)
     {
-        photonView.RPC("GenerateSpawnPoints", RpcTarget.AllBufferedViaServer);
+        Debug.LogError($" RPCSendEssesData spawnAt {spawnAt} address {playerAddress} horseSpeed {horseSpeed}");
+        photonView.RPC("SendEssesData", RpcTarget.AllBufferedViaServer, spawnAt, playerAddress, horseSpeed);
     }
 
     [PunRPC]
-    public void GenerateSpawnPoints()
+    public void SendEssesData(int spawnAt, string playerAddress, int horseSpeed)
     {
-        Debug.LogError("GenerateSpawnPoints");
-        if (racePlayer.Count > 1)
+        if(PhotonNetwork.IsMasterClient)
         {
-            Debug.LogError($"Player count {racePlayer.Count}");
-        }
-        else if (racePlayer.Count < 1)
-        {
-            Debug.LogError($"Player count 0");
-        }
-        for (int index = 0; index < racePlayer.Count; index++)
-        {
-            Debug.LogError("GenerateSpawnPoints");
-            if (racePlayer[index].joinedRaceInfo.playerName == PhotonNetwork.NickName)
+            Debug.LogError($" SendEssesData SpawnAt {spawnAt} Address {playerAddress} HorseSpeed {horseSpeed}");
+            WalletManager.Instance.AddAddress(spawnAt, playerAddress);
+            WalletManager.Instance.AddSpeed(spawnAt, horseSpeed);
+            if(spawnAt == 4)
             {
-                spawnAt = index; //i-th spot
+                Race[] _race = FindObjectsOfType<Race>();
+                foreach(Race race in _race)
+                {
+                    race._addedLastInfo = true;
+                }
             }
         }
-    }*/
+    }
 }

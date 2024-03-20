@@ -1040,7 +1040,6 @@ GameObject:
   - component: {fileID: 227476190}
   - component: {fileID: 227476189}
   - component: {fileID: 227476188}
-  - component: {fileID: 227476191}
   m_Layer: 0
   m_Name: WalletManager
   m_TagString: Untagged
@@ -1061,7 +1060,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _serverInstance: {fileID: 0}
-  devMode: 0
+  devMode: 1
+  generatedSpawnPoint: 0
   instanceId: {fileID: 1141531793}
   DevPanel: {fileID: 306100766}
   AptosTokenBalance: {fileID: 870999713}
@@ -1075,11 +1075,46 @@ MonoBehaviour:
   horseID: 0
   _horseSpeed: 0
   _acceleration: 0
+  acceleration: []
+  playerOneHurd:
+  - 0
+  - 0
+  - 0
+  playerTwoHurd:
+  - 0
+  - 0
+  - 0
+  playerThreeHurd:
+  - 0
+  - 0
+  - 0
+  playerFourHurd:
+  - 0
+  - 0
+  - 0
+  playerFiveHurd:
+  - 0
+  - 0
+  - 0
+  horsesMaxSpeed: 0000000000000000000000000000000000000000
+  address:
+  - 
+  - 
+  - 
+  - 
+  - 
   APTBalance: 0
   Username: 
   Address: 
   EquippedHorseId: 1000
+  joinedRaceInfos:
+    playerAddress: 
+    playerName: 
+    horseId: 0
+    horseSpeed: 0
   _canSwitch: 0
+  _createdServerInstance: 0
+  _playerInfoAdded: 0
 --- !u!4 &227476187
 Transform:
   m_ObjectHideFlags: 0
@@ -1136,28 +1171,6 @@ MonoBehaviour:
   currentAddressIndexKey: CurrentAddressIndexKey
   accountNumLimit: 10
   addressList: []
---- !u!114 &227476191
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 227476185}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 1
-  observableSearch: 2
-  ObservedComponents: []
-  sceneViewId: 5812516
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!1 &241702880
 GameObject:
   m_ObjectHideFlags: 0

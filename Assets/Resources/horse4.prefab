@@ -189,10 +189,15 @@ MonoBehaviour:
   playerProperties:
     color: 3
     id: 4
+    address: 
   raceManager: {fileID: 0}
   waypoints: {fileID: 0}
   animator: {fileID: 7734604272160221349}
   spriteRenderer: {fileID: 2007396681612400687}
+  _p1: 0
+  _p2: 0
+  _p3: 0
+  obstacleIndex: 0
   _up: {fileID: -2074315899, guid: f7f1ce929f0f2634da1c3a25a7f6955c, type: 3}
   _down: {fileID: -144289392, guid: f7f1ce929f0f2634da1c3a25a7f6955c, type: 3}
   _forward: {fileID: -826863933, guid: f7f1ce929f0f2634da1c3a25a7f6955c, type: 3}

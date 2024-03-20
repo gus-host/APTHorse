@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Aptos.Accounts;
 using Aptos.BCS;
+using Aptos.HdWallet;
 using Aptos.HdWallet.Utils;
 using Aptos.Unity.Rest;
 using Aptos.Unity.Rest.Model;
@@ -26,6 +28,10 @@ public class Race : MonoBehaviourPunCallbacks
     private int racePrice;
     private int raceLaps;
     private bool inRace = false;
+    private bool playerJoined = false;
+    public bool _addedLastInfo = false;
+    public bool _createdServerInstance = false;
+
     private SpinnerManager spinnerManager;
 
     void Start()
@@ -52,7 +58,11 @@ public class Race : MonoBehaviourPunCallbacks
 
         for (int i = 0; i < players.Count; i++)
         {
-            if (players[i].Value == WalletManager.Instance.Wallet.Account.AccountAddress.ToString()) inRace = true;
+            if (players[i].Value == WalletManager.Instance.Wallet.Account.AccountAddress.ToString())
+            {
+                WalletManager.Instance.spawnAt = i;
+                inRace = true;
+            } 
         }
 
         CheckInRace();
@@ -75,6 +85,7 @@ public class Race : MonoBehaviourPunCallbacks
         }
 
         spinnerManager.HideMessage();
+        playerJoined = true;
     }
 
     private void LockOtherRaces(bool disableOthers)
@@ -144,16 +155,20 @@ public class Race : MonoBehaviourPunCallbacks
 
         if (responseInfo.status == ResponseInfo.Status.Success)
         {
-            WalletManager.Instance.joinedRaceInfos.Add((int)raceId, new JoinedRaceInfo
+            WalletManager.Instance.joinedRaceInfos = new JoinedRaceInfo
             {
                 playerAddress = WalletManager.Instance.Address,
                 playerName = WalletManager.Instance.Username,
                 horseId = WalletManager.Instance.EquippedHorseId,
                 horseSpeed = FindObjectOfType<MarketplaceManager>().GetHorseSpeedById(WalletManager.Instance.EquippedHorseId)
-            });
+            };
             JoinArena();
             yield return StartCoroutine(CanStartRace());
             yield return StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
+            WalletManager.Instance._playerInfoAdded = true;                  
+
+            //Send Important data
+            //SendEssensData();
         }
         else
         {
@@ -162,6 +177,14 @@ public class Race : MonoBehaviourPunCallbacks
         } 
         yield return new WaitForSeconds(1);
         AptosUILink.Instance.LoadCurrentWalletBalance();
+    }
+
+    private void SendEssensData()
+    {
+        WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCSendEssesData(
+                    WalletManager.Instance.spawnAt,
+                    WalletManager.Instance.joinedRaceInfos.playerAddress,
+                    WalletManager.Instance.joinedRaceInfos.horseSpeed);
     }
 
     private IEnumerator CanStartRace()
@@ -198,21 +221,6 @@ public class Race : MonoBehaviourPunCallbacks
                 JSONNode randomHurdles = node[3];
 
                 List<RacePlayer> players = new();
-                /*for (int i = 0; i < randomAcceleration.Count; i++)
-                {
-                    List<float> playerHurdles = new();
-                    for (int j = 0; j < randomHurdles[i].Count; j++)
-                    {
-                        playerHurdles.Add(randomHurdles[i][j] / 100);
-                    }
-
-                    RacePlayer player = new()
-                    {
-                        acceleration = randomAcceleration[0] / 100,
-                        hurdles = playerHurdles
-                    };
-                    players.Add(player);
-                }*/
                 for (int i = 0; i < randomAcceleration.Count; i++)
                 {
                     List<float> playerHurdles = new();
@@ -228,20 +236,29 @@ public class Race : MonoBehaviourPunCallbacks
                     };
                     players.Add(player);
                 }
-                WalletManager.Instance.racePlayer = players;
-/*               WalletManager.Instance._horseSpeed = players;
-                WalletManager.Instance._acceleration = ;*/
-                WalletManager.Instance.raceId = raceId;
                 Debug.LogError("Waiting for 5 sec");
                 yield return new WaitUntil(() => PhotonNetwork.InRoom);
-                if (PhotonNetwork.InRoom)
+                if (PhotonNetwork.InRoom && PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
                 {
-                    WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCToggleSwitch(data);
-                    StartCoroutine(WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().InitSceneSwitchRPC());
+                    
+                    Debug.LogError("Multiplayer logic 1");
+
+                    //Send acceleration and hurdles data over network
+                    WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCRaceData(data);
+                    Debug.LogError("Multiplayer logic 2");
+
+                    //Wait until player check ins
+                    yield return new WaitUntil(() => playerJoined);
+
+                    //store local acceleration
+                    WalletManager.Instance._acceleration = players[WalletManager.Instance.spawnAt].acceleration;
+
+                    //Switch scene
+                    StartCoroutine(WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCInitSceneSwitch());
                 }
                 else
                 {
-                    Debug.LogError("Not In room");
+                    Debug.LogError("Not In room or Room not full");
                 }
             }
         }
@@ -251,6 +268,7 @@ public class Race : MonoBehaviourPunCallbacks
     {
         Debug.LogError($"JoinArena");
         Debug.LogError($"Race Id {raceId} && {PhotonNetwork.Server}");
+        WalletManager.Instance.raceId = (int)this.raceId;
         RoomOptions roomOptions = new RoomOptions() { MaxPlayers = 5, IsOpen = true, IsVisible = true };
         PhotonNetwork.JoinOrCreateRoom(raceId.ToString(), roomOptions, null);
     }
@@ -305,7 +323,7 @@ public class Race : MonoBehaviourPunCallbacks
         Debug.Log(responseInfo.status);
         if (responseInfo.status == ResponseInfo.Status.Success)
         {
-            WalletManager.Instance.joinedRaceInfos.Remove((int)raceId);
+            WalletManager.Instance.joinedRaceInfos = new();
             StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
             if (PhotonNetwork.InRoom)
             {

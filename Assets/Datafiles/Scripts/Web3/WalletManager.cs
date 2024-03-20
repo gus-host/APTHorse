@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Aptos.HdWallet;
 using Aptos.Unity.Rest;
 using Aptos.Unity.Sample.UI;
@@ -8,7 +9,8 @@ using Photon.Pun;
 using TMPro;
 using UnityEngine;
 
-public struct JoinedRaceInfo
+[Serializable]
+public class JoinedRaceInfo
 {
     public string playerAddress;
     public string playerName;
@@ -40,6 +42,7 @@ public class WalletManager : MonoBehaviourPunCallbacks
     public GameObject _serverInstance;
     //DEV USE ONLY - InstanceID
     public bool devMode = false;
+    public bool generatedSpawnPoint = false;
     public TMP_Dropdown instanceId;
     [SerializeField] private GameObject DevPanel;
 
@@ -54,16 +57,27 @@ public class WalletManager : MonoBehaviourPunCallbacks
     public int spawnAt;
     public int horseID;
     public int _horseSpeed;
-    public int _acceleration;
+    public float _acceleration;
+
+    public List<float> acceleration = new List<float>();
+    public float []playerOneHurd = new float[3];
+    public float []playerTwoHurd = new float[3];
+    public float []playerThreeHurd = new float[3];
+    public float []playerFourHurd = new float[3];
+    public float []playerFiveHurd = new float[3];
+    public int[] horsesMaxSpeed = new int[5];
+    public string[] address = new string[5];
 
     [HideInInspector] public Wallet Wallet = null;
     [HideInInspector] public float APTBalance;
-    [HideInInspector] public string Username = "";
-    [HideInInspector] public string Address = "";
+    public string Username = "";
+    public string Address = "";
     public int EquippedHorseId = 1000;
-    [HideInInspector] public Dictionary<int, JoinedRaceInfo> joinedRaceInfos = new();
+    public JoinedRaceInfo joinedRaceInfos = new();
 
     public bool _canSwitch = false;
+    public bool _createdServerInstance = false;
+    public bool _playerInfoAdded = false;
 
     void Awake()
     {
@@ -93,6 +107,7 @@ public class WalletManager : MonoBehaviourPunCallbacks
             if (bal < 10) StartCoroutine(AptosUILink.Instance.AirDrop(1000000000));
         };
         RestClient.Instance.SetEndPoint(Constants.RANDOMNET_BASE_URL);
+        ThreadPool.QueueUserWorkItem(new WaitCallback(SpawnServerInstance));
     }
 
     private void Update()
@@ -101,6 +116,15 @@ public class WalletManager : MonoBehaviourPunCallbacks
         {
             Debug.LogError("Spawning server instance");
             SpawnServerInstance();
+        }
+
+        if (_serverInstance != null)
+        {
+            Race[] _races = FindObjectsOfType<Race>();
+            foreach (var race in _races)
+            {
+                race._createdServerInstance = _createdServerInstance;
+            }
         }
     }
 
@@ -156,40 +180,32 @@ public class WalletManager : MonoBehaviourPunCallbacks
         base.OnPlayerEnteredRoom(newPlayer);
 
         _currentRoomName.text = "Room name:- " + PhotonNetwork.CurrentRoom.Name + " " + PhotonNetwork.CurrentRoom.PlayerCount + "/" + PhotonNetwork.CurrentRoom.MaxPlayers;
-        Debug.LogError("Assigning");
 
-        //RPCGenerateSpawnPoints();
-    }
-
-    public void SpawnServerInstance()
-    {
-       _serverInstance = PhotonNetwork.Instantiate("ServerInstance", new Vector3(0, 0, 0), Quaternion.identity);
-    }
-    
-    private void RPCGenerateSpawnPoints()
-    {
-        photonView.RPC("GenerateSpawnPoints", RpcTarget.AllBufferedViaServer);
-    }
-
-    [PunRPC]
-    public void GenerateSpawnPoints()
-    {
-/*        Debug.LogError("GenerateSpawnPoints");
-        if (racePlayer.Count > 1)
+        if (_serverInstance == null)
         {
-            Debug.LogError($"Player count {racePlayer.Count}");
-        }else if (racePlayer.Count<1)
-        {
-            Debug.LogError($"Player count 0");
+            Debug.LogError("Spawning server instance");
+            SpawnServerInstance();
         }
-        for (int index = 0; index < racePlayer.Count; index++)
+
+        Debug.LogError("Assigning");
+    }
+
+    public void SpawnServerInstance(object state = null)
+    {
+        _serverInstance = PhotonNetwork.Instantiate("ServerInstance", new Vector3(0, 0, 0), Quaternion.identity);
+        StartCoroutine(SendEssensData());
+        _createdServerInstance = true;
+        Race[] _races = FindObjectsOfType<Race>();
+        foreach (var race in _races)
         {
-            Debug.LogError("GenerateSpawnPoints");
-            if (racePlayer[index].joinedRaceInfo.playerName == PhotonNetwork.NickName)
-            {
-                spawnAt = index; //i-th spot
-            }
-        }*/
+            race._createdServerInstance = _createdServerInstance;
+        }
+    }
+
+    private IEnumerator SendEssensData()
+    {
+        yield return new WaitUntil(()=>_createdServerInstance && _playerInfoAdded);
+        _serverInstance.GetComponent<ServerInstance>().RPCSendEssesData(spawnAt, joinedRaceInfos.playerAddress, joinedRaceInfos.horseSpeed);
     }
 
     public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
@@ -201,5 +217,27 @@ public class WalletManager : MonoBehaviourPunCallbacks
     internal void SaveHorseId(int val)
     {
         PlayerPrefs.SetInt("HorseId", val);
+    }
+
+    public void AddAddress(int index, string val)
+    {
+        for(int ind = 0; ind < address.Length; ind++)
+        {
+            if(ind == index)
+            {
+                address[ind] = val;
+            }
+        }
+    }
+
+    public void AddSpeed(int index, int val)
+    {
+        for (int ind = 0; ind < horsesMaxSpeed.Length; ind++)
+        {
+            if (ind == index)
+            {
+                horsesMaxSpeed[ind] = val;
+            }
+        }
     }
 }

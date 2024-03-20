@@ -3,6 +3,7 @@
 
 using Photon.Pun;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -25,11 +26,16 @@ public class RaceManager : MonoBehaviourPunCallbacks
     public Transform _content;
     public PlayerItem playerItem;
 
+   /* public List<float> acceleration = new List<float>();
+    public List<int> speed = new List<int>();
+    public List<string>  address= new List<string>();*/
 
     public int jockeyId;
     public int totalLap;
+
+    public bool addedAllJockeys = false;
     
-    public HorseController[] jockeys;
+    public HorseController[] jockeys = new HorseController[5];
     public int jockeysIndex = 0;
     public List<HorseController> _horseRanks = new List<HorseController>();
     static Action UpdateAtt;
@@ -73,10 +79,7 @@ public class RaceManager : MonoBehaviourPunCallbacks
             Bet();
         }
         );
-        _start.onClick.AddListener(() =>
-        {
-            photonView.RPC("StartRace", RpcTarget.AllBuffered);
-        });
+        StartCoroutine(AssignValues());
     }
 
 
@@ -85,26 +88,100 @@ public class RaceManager : MonoBehaviourPunCallbacks
         jockeys[jockeysIndex++] = _horse;
     }
 
-
-    [PunRPC]
-    private void StartRace()
+    private IEnumerator AssignValues()
     {
-        //Generate random values like minimum speed and acceleration
-        GenerateRandomValues();
-
-        //Assign these values to all other horses across all clients
+        Debug.LogError("Assigning values to each horse");
+        yield return new WaitUntil(() => addedAllJockeys);
         if (PhotonNetwork.IsMasterClient)
         {
+            if(WalletManager.Instance.raceId == 0)
+            {
+                totalLap = 1;
+            }else if(WalletManager.Instance.raceId == 1)
+            {
+                totalLap = 3;
+            }else if(WalletManager.Instance.raceId == 2)
+            {
+                totalLap = 5;
+            }
             for (int i = 0; i< jockeys.Length; i++)
             {
-                photonView.RPC("SyncJockeyValues", RpcTarget.All,i , jockeys[i]._maxSpeed, jockeys[i]._minSpeed, jockeys[i]._acceleration, jockeys[i].totalLap, jockeys[i].lapLeft, jockeys[i]._lastLap);
+                float []hurd = new float[3];
+                if(i==0)
+                {
+                    hurd = WalletManager.Instance.playerOneHurd;
+                }else if(i==1)
+                {
+                    hurd = WalletManager.Instance.playerTwoHurd;
+                }
+                else if (i == 2)
+                {
+                    hurd = WalletManager.Instance.playerThreeHurd;
+                }
+                else if (i == 3)
+                {
+                    hurd = WalletManager.Instance.playerFourHurd;
+                }
+                else if (i == 4)
+                {
+                    hurd = WalletManager.Instance.playerFiveHurd;
+                }
+                if (jockeys[i] != null)
+                {
+                    float hurd1 = 0;
+                    float hurd2 = 0;
+                    float hurd3 = 0;
+                    if (totalLap == 1)
+                    {
+                        hurd1 = hurd[0];
+                    }
+                    else if(totalLap==3)
+                    {
+                        hurd1 = hurd[0];
+                        hurd2 = hurd[1];
+                        hurd3 = hurd[2];
+                    }
+
+                    Debug.LogError($"Assigning values to horse {jockeys[i].name} hurd1{hurd1} hurd2{hurd2} hurd3 {hurd3}");
+                    
+                    int maxSpeed =Mathf.CeilToInt(WalletManager.Instance.horsesMaxSpeed[i]/1.5f);
+                    float acceleration = WalletManager.Instance.acceleration[i];
+                    string address = WalletManager.Instance.address[i];
+                    jockeys[i].RPCAssign(i , maxSpeed,
+                    0,
+                    acceleration,
+                    address,
+                    totalLap,
+                    totalLap,
+                    true,
+                    hurd1,
+                    hurd2,
+                    hurd3);
+                }
+                else
+                {
+                    Debug.LogError($"Horse is null");
+                }
             }
-            // Synchronize random values with other clients
         }
 
-        CallDisableBetPanelRPC();
+        //CallDisableBetPanelRPC();
+
+        _toastText.text = "Race starting in 5 seconds";
+        LeanTween.alphaCanvas(_toast, 1, 1f).setOnComplete(() => { LeanTween.alphaCanvas(_toast, 0, 3f); });
+        yield  return new WaitForSeconds(5f);
+        StartRace();
     }
 
+    private void StartRace()
+    {
+        foreach (var horse in jockeys)
+        {
+            horse.StartRace();
+        }
+    }
+
+    //Everyone will generate random values but the ones host generated will be asigned to all at line 96
     private void GenerateRandomValues()
     {
         foreach (var jockey in jockeys)
@@ -120,6 +197,7 @@ public class RaceManager : MonoBehaviourPunCallbacks
             }
         }
     }
+
     [PunRPC]
     private void SyncJockeyValues(int jockeyIndex, float maxSpeed, float minSpeed, float acceleration, int totalLap, int lapLeft, bool lastLap)
     {
@@ -132,7 +210,7 @@ public class RaceManager : MonoBehaviourPunCallbacks
         {
             jockeys[jockeyIndex]._lastLap = lastLap;
         }
-        jockeys[jockeyIndex].StartRace();
+        //jockeys[jockeyIndex].StartRace();
     }
 
     [PunRPC]
@@ -199,7 +277,7 @@ public class RaceManager : MonoBehaviourPunCallbacks
         if (horses.Count>4)
         {
             ResultPanel.SetActive(true);
-            while (horses.Count>0)
+            while (horses.Count>0 && horses.Count < 6)
             { 
                 _horseRanks.Add(horses.Pop());
             }
@@ -207,10 +285,13 @@ public class RaceManager : MonoBehaviourPunCallbacks
             int rank = 1;
             foreach (var horse in _horseRanks)
             {
+                if (rank > 5) break;
+
                 GameObject playerInfo = Instantiate(playerItem.gameObject, _content);
                 playerInfo.GetComponent<PlayerItem>()._playerName.text = rank.ToString() + ". " + horse.playerProperties.color.ToString();
                 rank++;
             }
+            //Distribute Prize
         }
     }
 }
