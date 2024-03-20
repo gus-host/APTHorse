@@ -218,7 +218,7 @@ public class Race : MonoBehaviourPunCallbacks
                     //store local acceleration
                     WalletManager.Instance._acceleration = players[WalletManager.Instance.spawnAt].acceleration;
 
-                    WalletManager.Instance._blockchainRoomFull = true;
+                    WalletManager.Instance.RPCBlockchainRoomFull();
                 }
                 else
                 {

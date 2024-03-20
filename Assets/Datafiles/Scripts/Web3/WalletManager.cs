@@ -209,7 +209,7 @@ public class WalletManager : MonoBehaviourPunCallbacks
         if(PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers)
         {
             yield return new WaitUntil(()=> _blockchainRoomFull);
-            StartCoroutine(WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCInitSceneSwitch());
+            _serverInstance.GetComponent<ServerInstance>().RPCInitSceneSwitch();
         }
         yield return null;
     }
@@ -298,6 +298,18 @@ public class WalletManager : MonoBehaviourPunCallbacks
             {
                 horsesMaxSpeed[ind] = val;
             }
+        }
+    }
+
+    internal void RPCBlockchainRoomFull()
+    {
+        if(_serverInstance != null)
+        {
+            _serverInstance.GetComponent<ServerInstance>().RPCMakeBlockchainRoomFull(true);
+        }
+        else
+        {
+            Debug.LogError("ServerInstance is null");
         }
     }
 }
