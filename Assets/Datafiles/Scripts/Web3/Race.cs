@@ -32,6 +32,7 @@ public class Race : MonoBehaviourPunCallbacks
     public bool _addedLastInfo = false;
     public bool _createdServerInstance = false;
 
+    private int playersInRace;
     private SpinnerManager spinnerManager;
 
     void Start()
@@ -55,6 +56,7 @@ public class Race : MonoBehaviourPunCallbacks
         racePriceText.text = $"{AptosUILink.Instance.AptosTokenToFloat(racePrice)} APT";
         raceStartedText.text = $"{(raceStarted ? "Ongoing" : "Not Started")}";
         playersJoinedText.text = $"Players: {players.Count}/5";
+        playersInRace = players.Count;
 
         for (int i = 0; i < players.Count; i++)
         {
@@ -62,6 +64,13 @@ public class Race : MonoBehaviourPunCallbacks
             {
                 WalletManager.Instance.spawnAt = i;
                 inRace = true;
+                WalletManager.Instance.joinedRaceInfos = new JoinedRaceInfo
+                {
+                    playerAddress = WalletManager.Instance.Address,
+                    playerName = WalletManager.Instance.Username,
+                    horseId = WalletManager.Instance.EquippedHorseId,
+                    horseSpeed = FindObjectOfType<MarketplaceManager>().GetHorseSpeedById(WalletManager.Instance.EquippedHorseId)
+                };
             } 
         }
 
@@ -75,13 +84,13 @@ public class Race : MonoBehaviourPunCallbacks
 
         if (inRace)
         {
-            leaveRaceButton.gameObject.SetActive(true);
             LockOtherRaces(true);
+            leaveRaceButton.gameObject.SetActive(true);
         }
         else
         {
-            joinRaceButton.gameObject.SetActive(true);
             LockOtherRaces(false);
+            joinRaceButton.gameObject.SetActive(playersInRace < 5); 
         }
 
         spinnerManager.HideMessage();
