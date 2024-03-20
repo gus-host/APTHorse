@@ -17,18 +17,18 @@ public class ServerInstance : MonoBehaviourPunCallbacks
         DontDestroyOnLoad(gameObject);
         spinnner = FindObjectOfType<SpinnerManager>();
     }
-    public void RPCInitSceneSwitch()
+    public IEnumerator RPCInitSceneSwitch()
     {
-        if(!PhotonNetwork.InRoom)
+        if (!PhotonNetwork.InRoom)
         {
             Debug.LogError("Not in room");
-            return; 
+            yield return null;
         }
         spinnner.ShowMessage("Loading race");
         Debug.LogError("InitSceneSwitch");
-       
-        photonView.RPC("SwitchToRace", RpcTarget.AllBufferedViaServer);
-        return; 
+
+        photonView.RPC("SwitchToRace", RpcTarget.All);
+        yield return null;
     }
 
     [PunRPC]
