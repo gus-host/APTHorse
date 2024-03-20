@@ -1,5 +1,6 @@
 using Photon.Pun;
 using SimpleJSON;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,16 +19,16 @@ public class ServerInstance : MonoBehaviourPunCallbacks
     }
     public IEnumerator RPCInitSceneSwitch()
     {
-        if(!PhotonNetwork.InRoom)
+        if (!PhotonNetwork.InRoom)
         {
             Debug.LogError("Not in room");
-            yield return null; 
+            yield return null;
         }
         spinnner.ShowMessage("Loading race");
         Debug.LogError("InitSceneSwitch");
-       
+
         photonView.RPC("SwitchToRace", RpcTarget.All);
-        yield return null; 
+        yield return null;
     }
 
     [PunRPC]
@@ -140,5 +141,18 @@ public class ServerInstance : MonoBehaviourPunCallbacks
         {
             StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
         }
+    }
+
+    internal void RPCMakeBlockchainRoomFull(bool val)
+    {
+        Debug.LogError("RPCMakeBlockchainRoomFull");
+        photonView.RPC("MakeBlockchainRoomFull", RpcTarget.AllBufferedViaServer, val);
+    }
+
+    [PunRPC]
+    public void MakeBlockchainRoomFull(bool val)
+    {
+        Debug.LogError("MakeBlockchainRoomFull");
+        WalletManager.Instance._blockchainRoomFull = val;
     }
 }
