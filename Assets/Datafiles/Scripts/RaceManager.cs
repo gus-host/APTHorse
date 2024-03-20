@@ -268,6 +268,7 @@ public class RaceManager : MonoBehaviourPunCallbacks
     {
         photonView.RPC("PrintStack", RpcTarget.All);
     }
+
     [PunRPC]
     public void PrintStack()
     {

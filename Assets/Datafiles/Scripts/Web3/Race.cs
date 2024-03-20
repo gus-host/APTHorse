@@ -140,9 +140,6 @@ public class Race : MonoBehaviourPunCallbacks
             yield return StartCoroutine(CanStartRace());
             yield return StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
             WalletManager.Instance._playerInfoAdded = true;                  
-
-            //Send Important data
-            //SendEssensData();
         }
         else
         {
@@ -151,14 +148,6 @@ public class Race : MonoBehaviourPunCallbacks
         } 
         yield return new WaitForSeconds(1);
         AptosUILink.Instance.LoadCurrentWalletBalance();
-    }
-
-    private void SendEssensData()
-    {
-        WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCSendEssesData(
-                    WalletManager.Instance.spawnAt,
-                    WalletManager.Instance.joinedRaceInfos.playerAddress,
-                    WalletManager.Instance.joinedRaceInfos.horseSpeed);
     }
 
     private IEnumerator CanStartRace()

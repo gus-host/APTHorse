@@ -73,6 +73,7 @@ public class WalletManager : MonoBehaviourPunCallbacks
     public string Username = "";
     public string Address = "";
     public int EquippedHorseId = 1000;
+    public int horseSpeed = 0;
     public JoinedRaceInfo joinedRaceInfos = new();
 
     public bool _canSwitch = false;
@@ -187,14 +188,24 @@ public class WalletManager : MonoBehaviourPunCallbacks
             SpawnServerInstance();
         }
 
-        Debug.LogError("Assigning");
+        RaceObjectManager _raceObject = FindObjectOfType<RaceObjectManager>();
+        if (_raceObject != null)
+        {
+            _serverInstance.GetComponent<ServerInstance>().RPCFetchRaceDataAsync(true);
+        }
+        else
+        {
+            Debug.LogError("GetRaceDataAsyncNotFound");
+        }
     }
 
     public void SpawnServerInstance(object state = null)
     {
         _serverInstance = PhotonNetwork.Instantiate("ServerInstance", new Vector3(0, 0, 0), Quaternion.identity);
-        StartCoroutine(SendEssensData());
-        _createdServerInstance = true;
+        if(_serverInstance != null)
+        {
+            _createdServerInstance = true;
+        }
         Race[] _races = FindObjectsOfType<Race>();
         foreach (var race in _races)
         {
@@ -202,16 +213,49 @@ public class WalletManager : MonoBehaviourPunCallbacks
         }
     }
 
-    private IEnumerator SendEssensData()
+    public IEnumerator SendEssensData()
     {
-        yield return new WaitUntil(()=>_createdServerInstance && _playerInfoAdded);
-        _serverInstance.GetComponent<ServerInstance>().RPCSendEssesData(spawnAt, joinedRaceInfos.playerAddress, joinedRaceInfos.horseSpeed);
+        yield return new WaitUntil(()=>_createdServerInstance);
+
+        horseSpeed = FindObjectOfType<MarketplaceManager>().GetHorseSpeedById(WalletManager.Instance.EquippedHorseId);
+        
+        Debug.LogError($"ServerInstance stats {_createdServerInstance}");
+        if (_serverInstance != null)
+        {
+            _serverInstance.GetComponent<ServerInstance>().RPCSendEssesData(spawnAt, joinedRaceInfos.playerAddress, joinedRaceInfos.horseSpeed);
+        }
+        else
+        {
+            Debug.LogError("ServerInstance is null");
+        }
     }
 
     public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
     {
         base.OnPlayerLeftRoom(otherPlayer);
         _currentRoomName.text = "Room name:- " + PhotonNetwork.CurrentRoom.Name + " " + PhotonNetwork.CurrentRoom.PlayerCount + "/" + PhotonNetwork.CurrentRoom.MaxPlayers;
+
+        RaceObjectManager _raceObject = FindObjectOfType<RaceObjectManager>();
+        if (_raceObject != null)
+        {
+            _serverInstance.GetComponent<ServerInstance>().RPCFetchRaceDataAsync(true);
+        }
+        else
+        {
+            Debug.LogError("GetRaceDataAsyncNotFound");
+        }
+    }
+
+    
+
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        base.OnJoinRoomFailed(returnCode, message);
+        Race[] _races = FindObjectsOfType<Race>();
+        foreach (var race in _races)
+        {
+            race.LeaveRace();
+        }
     }
 
     internal void SaveHorseId(int val)
