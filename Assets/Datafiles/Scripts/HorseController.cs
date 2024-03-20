@@ -1,6 +1,7 @@
 using Photon.Pun;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum HorseColor
@@ -17,6 +18,7 @@ public struct Player
 {
     public HorseColor color;
     public int id;
+    public string address;
 }
 
 public class HorseController : MonoBehaviourPunCallbacks
@@ -28,6 +30,10 @@ public class HorseController : MonoBehaviourPunCallbacks
     public WayPointList waypoints;
     public Animator animator;
     public SpriteRenderer spriteRenderer;
+    public float _p1;
+    public float _p2;
+    public float _p3;
+    public int obstacleIndex = 0;
 
     public Sprite _up;
     public Sprite _down;
@@ -77,9 +83,7 @@ public class HorseController : MonoBehaviourPunCallbacks
         raceManager = FindObjectOfType<RaceManager>();
 
         // Add horse to the Racemanager
-        #region
-        horseId = playerProperties.id - 1;
-        
+        #region        
         if (raceManager.jockeys.Length <=5)
         {
             raceManager.AddHorse(this);
@@ -93,8 +97,6 @@ public class HorseController : MonoBehaviourPunCallbacks
             Debug.LogError($"Invalid index: {horseId} and max index {raceManager.jockeys.Length}");
         }
         #endregion
-
-        photonView.RPC("GetTheWaypoint", RpcTarget.AllBuffered);
 
         RunStraight = Animator.StringToHash("RunStraight");
         RunDownHash = Animator.StringToHash("RunDown");
@@ -125,11 +127,12 @@ public class HorseController : MonoBehaviourPunCallbacks
             animator.SetBool(RunUpHash, false);
         }
 
-        // Disable start button if not masterclient
-        if(PhotonNetwork.LocalPlayer == PhotonNetwork.MasterClient)
-        {
-            raceManager._start.gameObject.SetActive(true);
-        }
+        
+    }
+
+    public void INIT()
+    {
+        photonView.RPC("GetTheWaypoint", RpcTarget.AllBuffered);
     }
 
 
@@ -143,22 +146,27 @@ public class HorseController : MonoBehaviourPunCallbacks
             if (horseId == 0 && waypointList.horseSer == HorseSer.H1)
             {
                 waypoints = waypointList;
+                transform.position = waypoints._wayPoint[0].position;
             }
             else if (horseId == 1 && waypointList.horseSer == HorseSer.H2)
             {
                 waypoints = waypointList;
+                transform.position = waypoints._wayPoint[0].position;
             }
             else if (horseId == 2 && waypointList.horseSer == HorseSer.H3)
             {
                 waypoints = waypointList;
+                transform.position = waypoints._wayPoint[0].position;
             }
             else if (horseId == 3 && waypointList.horseSer == HorseSer.H4)
             {
                 waypoints = waypointList;
+                transform.position = waypoints._wayPoint[0].position;
             }
             else if (horseId == 4 && waypointList.horseSer == HorseSer.H5)
             {
                 waypoints = waypointList;
+                transform.position = waypoints._wayPoint[0].position;
             }
         }
     }
@@ -166,6 +174,12 @@ public class HorseController : MonoBehaviourPunCallbacks
     public void StartRace()
     {
         StartCoroutine(Move());
+        
+        if (obstacleIndex == 0)
+        {
+            waypoints.SpawnObstacleAtPercentage(_p1, obstacleIndex++);
+        }
+
         if (playerProperties.color == HorseColor.Green)
         {
             animator.SetBool(IdleDownHash, false);
@@ -216,7 +230,9 @@ public class HorseController : MonoBehaviourPunCallbacks
             else if (Vector3.Distance(transform.position, _target.position) <= 0.1f)
             {
                 //Check for next lap
+                
                 index++;
+
                 //Last checkpoint and index gone out of bounds then 
                 // 1. Decrease total lap
                 // 2. Total lap is non negative then restart by index = 0
@@ -344,6 +360,11 @@ public class HorseController : MonoBehaviourPunCallbacks
             _InForwardRange = true;
             _InUpRange = false;
         }
+        else if (collision.gameObject.CompareTag("Puddle"))
+        {
+            currentSpeed = _minSpeed;
+            Destroy(collision.gameObject);
+        }
         #endregion
         // Reduce lap and check for game finished
         else if (collision.gameObject.TryGetComponent<OnEnterDisableCollider>(out OnEnterDisableCollider onEnterDisableCollider)
@@ -357,7 +378,7 @@ public class HorseController : MonoBehaviourPunCallbacks
     {
         if (!_lastLap)
         {
-            photonView.RPC("RPCReduceLapandUpdateCheckpoint", RpcTarget.AllBuffered);
+            photonView.RPC("RPCReduceLapandUpdateCheckpoint", RpcTarget.All);
             if (onEnterDisableCollider._nextCheckpoint.Length > 0)
             {
                 onEnterDisableCollider.UpdateCheckPoint();
@@ -412,32 +433,6 @@ public class HorseController : MonoBehaviourPunCallbacks
             }
         }
     }
-    /*
-        [PunRPC]
-        public void RPCReduceLapandUpdateCheckpoint()
-        {
-            if (!lapReductionProcessed)
-            {
-                ReduceLapandCheckForLastLap();
-                lapReductionProcessed = true;
-            }
-        }
-
-        private void ReduceLapandCheckForLastLap()
-        {
-            lapLeft--;
-            lapReductionProcessed = false;
-            if (lapLeft == 1)
-            {
-                photonView.RPC("SetLastLap", RpcTarget.All, true);
-            }
-        }
-
-        [PunRPC]
-        private void SetLastLap(bool lastLap)
-        {
-            StartCoroutine(DelayLastLap(lastLap));
-        }*/
 
     [PunRPC]
     public void RPCReduceLapandUpdateCheckpoint()
@@ -451,16 +446,25 @@ public class HorseController : MonoBehaviourPunCallbacks
         {
             lapLeft--;
             lapReductionProcessed = true;
+            if (obstacleIndex == 1)
+            {
+                waypoints.SpawnObstacleAtPercentage(_p2, obstacleIndex++);
+            }else if(obstacleIndex == 2)
+            {
+                waypoints.SpawnObstacleAtPercentage(_p3, obstacleIndex++);
+            }
         }
-        photonView.RPC("SetLapReductionProcessed", RpcTarget.AllBuffered, true);
-        photonView.RPC("RPCDelayLapReductionProcessed", RpcTarget.AllBuffered, true);
+        photonView.RPC("SetLapReductionProcessed", RpcTarget.All, true);
+        photonView.RPC("RPCDelayLapReductionProcessed", RpcTarget.All, true);
     }
 
     [PunRPC]
     private void SetLapReductionProcessed(bool processed)
     {
+        Debug.LogError("Last lap");
         if (processed && lapLeft == 1)
         {
+            Debug.LogError("Last lap");
             StartCoroutine(DelayLastLap(true));
         }
     }
@@ -468,33 +472,55 @@ public class HorseController : MonoBehaviourPunCallbacks
     [PunRPC]
     private void RPCDelayLapReductionProcessed(bool processed)
     {
-           StartCoroutine(DelayLapReductionProcessed(processed));
+        StartCoroutine(DelayLapReductionProcessed(processed));
     }
 
     private IEnumerator DelayLapReductionProcessed(bool lastLap)
     {
-        yield return new WaitForSeconds(1.5f);
+        Debug.LogError("LapReductionprocessed");
+        yield return new WaitForSecondsRealtime(1.5f);
         lapReductionProcessed = !lastLap;
     }
     private IEnumerator DelayLastLap(bool lastLap)
     {
-        yield return new WaitForSeconds(1.5f);
+        Debug.LogError("Last lap");
+        yield return new WaitForSecondsRealtime(1.5f);
         _lastLap = lastLap;
     }
 
-    public void RPCAssign(int speed, float minSpeed, float acceleration, int totalLap, int lapLeft, bool lastLap)
+    public void RPCAssign(int horseId, int speed, float minSpeed, float acceleration,string address , int totalLap, int lapLeft, bool lastLap, float p1, float p2, float p3)
     {
-        photonView.RPC("AssignVal", RpcTarget.AllBufferedViaServer ,speed, minSpeed, acceleration, totalLap, lapLeft, lastLap);
+        photonView.RPC("AssignVal", RpcTarget.AllBufferedViaServer,horseId ,speed, minSpeed, acceleration,address , totalLap, lapLeft, lastLap, p1, p2, p3);
     }
 
     [PunRPC]
-    public void AssignVal(int speed, float minSpeed, float acceleration, int _totalLap, int _lapLeft, bool lastLap)
+    public void AssignVal(int _horseID ,int speed, float minSpeed, float acceleration,string address , int _totalLap, int _lapLeft, bool lastLap, float p1, float p2, float p3)
     {
+        horseId = _horseID;
         _maxSpeed = speed;
         _minSpeed = minSpeed;
         _acceleration = acceleration;
         totalLap = _totalLap;
-        _lapLeft = lapLeft;
-        _lastLap = lastLap;
+        lapLeft  = _lapLeft;
+        if (totalLap == 1)
+        {
+            _lastLap = lastLap;
+        }
+        _p1 = p1;
+        _p2 = p2;
+        _p3 = p3;
+        playerProperties.address = address;
+        INIT();
+    }
+
+    internal void RPCAssignHorseID(int spawnAt)
+    {
+        photonView.RPC("AssignHorseID", RpcTarget.AllBufferedViaServer, spawnAt);
+    }
+
+    [PunRPC]
+    public void AssignHorseID(int val)
+    {
+        horseId = val;
     }
 }

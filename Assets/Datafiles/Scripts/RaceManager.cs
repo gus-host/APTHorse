@@ -106,17 +106,57 @@ public class RaceManager : MonoBehaviourPunCallbacks
             }
             for (int i = 0; i< jockeys.Length; i++)
             {
-                if(jockeys[i] != null)
+                float []hurd = new float[3];
+                if(i==0)
                 {
-                    Debug.LogError($"Assigning valuesto horse {jockeys[i].name}");
-                    int maxSpeed = WalletManager.Instance.horsesMaxSpeed[i];
+                    hurd = WalletManager.Instance.playerOneHurd;
+                }else if(i==1)
+                {
+                    hurd = WalletManager.Instance.playerTwoHurd;
+                }
+                else if (i == 2)
+                {
+                    hurd = WalletManager.Instance.playerThreeHurd;
+                }
+                else if (i == 3)
+                {
+                    hurd = WalletManager.Instance.playerFourHurd;
+                }
+                else if (i == 4)
+                {
+                    hurd = WalletManager.Instance.playerFiveHurd;
+                }
+                if (jockeys[i] != null)
+                {
+                    float hurd1 = 0;
+                    float hurd2 = 0;
+                    float hurd3 = 0;
+                    if (totalLap == 1)
+                    {
+                        hurd1 = hurd[0];
+                    }
+                    else if(totalLap==3)
+                    {
+                        hurd1 = hurd[0];
+                        hurd2 = hurd[1];
+                        hurd3 = hurd[2];
+                    }
+
+                    Debug.LogError($"Assigning values to horse {jockeys[i].name} hurd1{hurd1} hurd2{hurd2} hurd3 {hurd3}");
+                    
+                    int maxSpeed =Mathf.CeilToInt(WalletManager.Instance.horsesMaxSpeed[i]/2);
                     float acceleration = WalletManager.Instance.acceleration[i];
-                    jockeys[i].RPCAssign(maxSpeed,
+                    string address = WalletManager.Instance.address[i];
+                    jockeys[i].RPCAssign(i , maxSpeed,
                     0,
                     acceleration,
+                    address,
                     totalLap,
                     totalLap,
-                    true);
+                    true,
+                    hurd1,
+                    hurd2,
+                    hurd3);
                 }
                 else
                 {
@@ -127,9 +167,10 @@ public class RaceManager : MonoBehaviourPunCallbacks
 
         //CallDisableBetPanelRPC();
 
+        _toastText.text = "Race starting in 5 seconds";
+        LeanTween.alphaCanvas(_toast, 1, 1f).setOnComplete(() => { LeanTween.alphaCanvas(_toast, 0, 3f); });
+        yield  return new WaitForSeconds(5f);
         StartRace();
-        
-        yield return null;
     }
 
     private void StartRace()
@@ -236,7 +277,7 @@ public class RaceManager : MonoBehaviourPunCallbacks
         if (horses.Count>4)
         {
             ResultPanel.SetActive(true);
-            while (horses.Count>0)
+            while (horses.Count>0 && horses.Count < 6)
             { 
                 _horseRanks.Add(horses.Pop());
             }
@@ -244,10 +285,13 @@ public class RaceManager : MonoBehaviourPunCallbacks
             int rank = 1;
             foreach (var horse in _horseRanks)
             {
+                if (rank > 5) break;
+
                 GameObject playerInfo = Instantiate(playerItem.gameObject, _content);
                 playerInfo.GetComponent<PlayerItem>()._playerName.text = rank.ToString() + ". " + horse.playerProperties.color.ToString();
                 rank++;
             }
+            //Distribute Prize
         }
     }
 }

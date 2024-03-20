@@ -61,8 +61,7 @@ public class MultiplayerPlayerSpawner : MonoBehaviourPunCallbacks
         // Spawn the player across the network.
         var player = PhotonNetwork.Instantiate(_playerPrefab[WalletManager.Instance.EquippedHorseId].name, _spawnPoints[WalletManager.Instance.spawnAt].transform.position, Quaternion.identity);
 
-        HorseController _horseController = player.GetComponent<HorseController>();
-
+        HorseController _horseController = player.GetComponent<HorseController>();        
         // Access a custom room property
     }
 }

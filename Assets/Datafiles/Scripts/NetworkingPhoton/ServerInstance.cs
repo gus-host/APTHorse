@@ -67,9 +67,26 @@ public class ServerInstance : MonoBehaviourPunCallbacks
             List<float> playerHurdles = new();
             for (int j = 0; j < randomHurdles[i].Count; j++)
             {
-                playerHurdles.Add(int.Parse(randomHurdles[i][j].Value) / 100);
+                playerHurdles.Add((float)int.Parse(randomHurdles[i][j].Value) / 100);
             }
-
+            if (i == 0)
+            {
+                WalletManager.Instance.playerOneHurd = playerHurdles.ToArray();
+            }else if (i==1)
+            {
+                WalletManager.Instance.playerTwoHurd = playerHurdles.ToArray();
+            }else if (i == 2)
+            {
+                WalletManager.Instance.playerThreeHurd = playerHurdles.ToArray();
+            }
+            else if (i == 3)
+            {
+                WalletManager.Instance.playerFourHurd = playerHurdles.ToArray();
+            }
+            else if (i == 4)
+            {
+                WalletManager.Instance.playerFiveHurd = playerHurdles.ToArray();
+            }
             RacePlayer player = new()
             {
                 acceleration = (float)int.Parse(randomAcceleration[i].Value) / 100,

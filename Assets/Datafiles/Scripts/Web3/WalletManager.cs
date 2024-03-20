@@ -60,6 +60,11 @@ public class WalletManager : MonoBehaviourPunCallbacks
     public float _acceleration;
 
     public List<float> acceleration = new List<float>();
+    public float []playerOneHurd = new float[3];
+    public float []playerTwoHurd = new float[3];
+    public float []playerThreeHurd = new float[3];
+    public float []playerFourHurd = new float[3];
+    public float []playerFiveHurd = new float[3];
     public int[] horsesMaxSpeed = new int[5];
     public string[] address = new string[5];
 

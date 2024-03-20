@@ -1076,6 +1076,26 @@ MonoBehaviour:
   _horseSpeed: 0
   _acceleration: 0
   acceleration: []
+  playerOneHurd:
+  - 0
+  - 0
+  - 0
+  playerTwoHurd:
+  - 0
+  - 0
+  - 0
+  playerThreeHurd:
+  - 0
+  - 0
+  - 0
+  playerFourHurd:
+  - 0
+  - 0
+  - 0
+  playerFiveHurd:
+  - 0
+  - 0
+  - 0
   horsesMaxSpeed: 0000000000000000000000000000000000000000
   address:
   - 
@@ -1093,6 +1113,8 @@ MonoBehaviour:
     horseId: 0
     horseSpeed: 0
   _canSwitch: 0
+  _createdServerInstance: 0
+  _playerInfoAdded: 0
 --- !u!4 &227476187
 Transform:
   m_ObjectHideFlags: 0
