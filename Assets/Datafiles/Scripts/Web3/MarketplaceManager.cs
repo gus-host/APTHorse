@@ -15,6 +15,10 @@ public class MarketplaceManager : MonoBehaviour
     public Sprite[] horseSprite;
     private Dictionary<int, int> ownedHorses = new();
     [SerializeField] private GraphApi getAllTokensGraphQL;
+
+    public delegate void OnDataAquired();
+    public event OnDataAquired onDataAquired; 
+
     public IEnumerator GetMarketplaceDataAsync()
     {
         ResponseInfo responseInfo = new();
@@ -105,6 +109,14 @@ public class MarketplaceManager : MonoBehaviour
                 node[0][i]["id"].AsInt == equippedHorse
             );
         }
+
+        WalletManager.Instance.joinedRaceInfos = new JoinedRaceInfo
+        {
+            playerAddress = WalletManager.Instance.Address,
+            playerName = WalletManager.Instance.Username,
+            horseId = WalletManager.Instance.EquippedHorseId,
+            horseSpeed = GetHorseSpeedById(WalletManager.Instance.EquippedHorseId)
+        };
     }
 
     public int GetHorseSpeedById(int id)

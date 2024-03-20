@@ -64,13 +64,6 @@ public class Race : MonoBehaviourPunCallbacks
             {
                 WalletManager.Instance.spawnAt = i;
                 inRace = true;
-                WalletManager.Instance.joinedRaceInfos = new JoinedRaceInfo
-                {
-                    playerAddress = WalletManager.Instance.Address,
-                    playerName = WalletManager.Instance.Username,
-                    horseId = WalletManager.Instance.EquippedHorseId,
-                    horseSpeed = FindObjectOfType<MarketplaceManager>().GetHorseSpeedById(WalletManager.Instance.EquippedHorseId)
-                };
             } 
         }
 
@@ -79,32 +72,11 @@ public class Race : MonoBehaviourPunCallbacks
 
     private void CheckInRace()
     {
-        joinRaceButton.gameObject.SetActive(false);
-        leaveRaceButton.gameObject.SetActive(false);
-
-        if (inRace)
-        {
-            LockOtherRaces(true);
-            leaveRaceButton.gameObject.SetActive(true);
-        }
-        else
-        {
-            LockOtherRaces(false);
-            joinRaceButton.gameObject.SetActive(playersInRace < 5); 
-        }
+        leaveRaceButton.gameObject.SetActive(inRace);
+        joinRaceButton.gameObject.SetActive(!inRace);
 
         spinnerManager.HideMessage();
         playerJoined = true;
-    }
-
-    private void LockOtherRaces(bool disableOthers)
-    {
-        Race[] races = FindObjectsOfType<Race>();
-        for (int i = 0; i < races.Length; i++)
-        {
-            if (disableOthers && races[i] != this) races[i].joinRaceButton.gameObject.SetActive(false);
-            else races[i].joinRaceButton.gameObject.SetActive(true);
-        }
     }
 
     public IEnumerator JoinRace()
@@ -164,13 +136,6 @@ public class Race : MonoBehaviourPunCallbacks
 
         if (responseInfo.status == ResponseInfo.Status.Success)
         {
-            WalletManager.Instance.joinedRaceInfos = new JoinedRaceInfo
-            {
-                playerAddress = WalletManager.Instance.Address,
-                playerName = WalletManager.Instance.Username,
-                horseId = WalletManager.Instance.EquippedHorseId,
-                horseSpeed = FindObjectOfType<MarketplaceManager>().GetHorseSpeedById(WalletManager.Instance.EquippedHorseId)
-            };
             JoinArena();
             yield return StartCoroutine(CanStartRace());
             yield return StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());

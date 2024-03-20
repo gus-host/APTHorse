@@ -8,6 +8,7 @@ public class RaceObjectManager : MonoBehaviour
 {
     public Race raceGo;
     public Transform raceSpawn;
+
     public IEnumerator GetRaceDataAsync()
     {
         ResponseInfo responseInfo = new();
