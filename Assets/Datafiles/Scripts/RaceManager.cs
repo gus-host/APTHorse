@@ -290,12 +290,12 @@ public class RaceManager : MonoBehaviourPunCallbacks
             {
                 if (rank > 5) break;
 
-                winningOrder.Add(new BString(horse.playerProperties.address));
+                winningOrder.Add(new BString(horse.playerProperties.address.Replace("0x", "")));
                 GameObject playerInfo = Instantiate(playerItem.gameObject, _content);
                 playerInfo.GetComponent<PlayerItem>()._playerName.text = rank.ToString() + ". " + horse.playerProperties.color.ToString();
                 rank++;
             }
-            StartCoroutine(FindObjectOfType<EndRaceManager>().OnEndRace((ulong)WalletManager.Instance.raceId, winningOrder));
+            if(PhotonNetwork.IsMasterClient) StartCoroutine(FindObjectOfType<EndRaceManager>().OnEndRace((ulong)WalletManager.Instance.raceId, winningOrder));
         }
     }
 }
