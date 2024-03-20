@@ -1107,6 +1107,7 @@ MonoBehaviour:
   Username: 
   Address: 
   EquippedHorseId: 1000
+  horseSpeed: 0
   joinedRaceInfos:
     playerAddress: 
     playerName: 

@@ -63,7 +63,9 @@ public class Race : MonoBehaviourPunCallbacks
             if (players[i].Value == WalletManager.Instance.Wallet.Account.AccountAddress.ToString())
             {
                 WalletManager.Instance.spawnAt = i;
+                Debug.LogError($"i spawn at {i}");
                 inRace = true;
+                WalletManager.Instance._inRace= inRace;
             } 
         }
 
