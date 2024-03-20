@@ -202,8 +202,10 @@ public class WalletManager : MonoBehaviourPunCallbacks
     public void SpawnServerInstance(object state = null)
     {
         _serverInstance = PhotonNetwork.Instantiate("ServerInstance", new Vector3(0, 0, 0), Quaternion.identity);
-        StartCoroutine(SendEssensData());
-        _createdServerInstance = true;
+        if(_serverInstance != null)
+        {
+            _createdServerInstance = true;
+        }
         Race[] _races = FindObjectsOfType<Race>();
         foreach (var race in _races)
         {
@@ -211,11 +213,21 @@ public class WalletManager : MonoBehaviourPunCallbacks
         }
     }
 
-    private IEnumerator SendEssensData()
+    public IEnumerator SendEssensData()
     {
-        yield return new WaitUntil(()=>_createdServerInstance && _playerInfoAdded);
+        yield return new WaitUntil(()=>_createdServerInstance);
+
         horseSpeed = FindObjectOfType<MarketplaceManager>().GetHorseSpeedById(WalletManager.Instance.EquippedHorseId);
-        _serverInstance.GetComponent<ServerInstance>().RPCSendEssesData(spawnAt, joinedRaceInfos.playerAddress, joinedRaceInfos.horseSpeed);
+        
+        Debug.LogError($"ServerInstance stats {_createdServerInstance}");
+        if (_serverInstance != null)
+        {
+            _serverInstance.GetComponent<ServerInstance>().RPCSendEssesData(spawnAt, joinedRaceInfos.playerAddress, joinedRaceInfos.horseSpeed);
+        }
+        else
+        {
+            Debug.LogError("ServerInstance is null");
+        }
     }
 
     public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
