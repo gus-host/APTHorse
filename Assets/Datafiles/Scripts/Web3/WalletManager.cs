@@ -8,6 +8,7 @@ using Aptos.Unity.Sample.UI;
 using Photon.Pun;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [Serializable]
 public class JoinedRaceInfo
@@ -81,6 +82,7 @@ public class WalletManager : MonoBehaviourPunCallbacks
     public bool _playerInfoAdded = false;
     public bool _inRace = false;
     public bool _blockchainRoomFull = false;
+    public bool _completedRace = false;
 
     void Awake()
     {
@@ -129,6 +131,15 @@ public class WalletManager : MonoBehaviourPunCallbacks
                 race._createdServerInstance = _createdServerInstance;
             }
         }
+        if (_completedRace)
+        {
+            int sceneBuildIndex = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
+            if (sceneBuildIndex == 0)
+            {
+                _serverInstance.GetComponent<ServerInstance>().RPCLeaveRace(true);
+            }
+        }
+
     }
 
     public bool AuthenticateWithWallet()
