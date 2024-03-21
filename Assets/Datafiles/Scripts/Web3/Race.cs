@@ -24,7 +24,7 @@ public class Race : MonoBehaviourPunCallbacks
     public TextMeshProUGUI playersJoinedText;
     public Button joinRaceButton;
     public Button leaveRaceButton;
-    private ulong raceId;
+    public ulong raceId;
     private int racePrice;
     private int raceLaps;
     private bool inRace = false;
@@ -39,6 +39,14 @@ public class Race : MonoBehaviourPunCallbacks
     {
         joinRaceButton.onClick.AddListener(() => StartCoroutine(JoinRace()));
         leaveRaceButton.onClick.AddListener(() => StartCoroutine(LeaveRace()));
+        if (PlayerPrefs.HasKey("CompletedRace"))
+        {
+            string compledRace = PlayerPrefs.GetString("CompletedRace");
+            if(compledRace == "0"+raceId.ToString())
+            {
+                StartCoroutine(LeaveRace());
+            }
+        }
         if (inRace && !PhotonNetwork.InRoom && PhotonNetwork.IsConnected)
         {
             JoinArena();
@@ -66,6 +74,7 @@ public class Race : MonoBehaviourPunCallbacks
                 Debug.LogError($"i spawn at {i}");
                 inRace = true;
                 WalletManager.Instance._inRace= inRace;
+                PlayerPrefs.SetString("CompletedRace", "0"+ raceId.ToString());
             } 
         }
 
@@ -219,7 +228,7 @@ public class Race : MonoBehaviourPunCallbacks
                     WalletManager.Instance._acceleration = players[WalletManager.Instance.spawnAt].acceleration;
 
                     //WalletManager.Instance.RPCBlockchainRoomFull();
-                    StartCoroutine(WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCInitSceneSwitch());
+                    WalletManager.Instance._serverInstance.GetComponent<ServerInstance>().RPCInitSceneSwitch();
                 }
                 else
                 {
@@ -295,6 +304,7 @@ public class Race : MonoBehaviourPunCallbacks
             {
                 PhotonNetwork.LeaveRoom();
             }
+            PlayerPrefs.SetString("CompletedRace", "-1");
         }
         else
         {

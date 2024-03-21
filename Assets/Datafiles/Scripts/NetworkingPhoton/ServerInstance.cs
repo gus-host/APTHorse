@@ -3,6 +3,7 @@ using SimpleJSON;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class ServerInstance : MonoBehaviourPunCallbacks
@@ -11,24 +12,25 @@ public class ServerInstance : MonoBehaviourPunCallbacks
     public static ServerInstance Instance;
     public int spawnPoint;
     private SpinnerManager spinnner;
+
     private void Start()
     {
         Instance = this;
         DontDestroyOnLoad(gameObject);
         spinnner = FindObjectOfType<SpinnerManager>();
     }
-    public IEnumerator RPCInitSceneSwitch()
+    public void RPCInitSceneSwitch()
     {
         if (!PhotonNetwork.InRoom)
         {
             Debug.LogError("Not in room");
-            yield return null;
+            return;
         }
         spinnner.ShowMessage("Loading race");
         Debug.LogError("InitSceneSwitch");
-
+        Task.Delay(3000);
         photonView.RPC("SwitchToRace", RpcTarget.All);
-        yield return null;
+        return;
     }
 
     [PunRPC]
@@ -154,5 +156,24 @@ public class ServerInstance : MonoBehaviourPunCallbacks
     {
         Debug.LogError("MakeBlockchainRoomFull");
         WalletManager.Instance._blockchainRoomFull = val;
+    }
+
+    internal void RPCLeaveRace(bool v)
+    {
+        photonView.RPC("LeaveRace", RpcTarget.AllBuffered, v);
+    }
+
+    [PunRPC]
+    public void LeaveRace(bool v)
+    {
+        Race[] _races = FindObjectsOfType<Race>();
+        foreach (var race in _races)
+        {
+            if ((int)race.raceId == WalletManager.Instance.raceId)
+            {
+                StartCoroutine(race.LeaveRace());
+                WalletManager.Instance._completedRace = false;
+            }
+        }
     }
 }

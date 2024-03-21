@@ -1060,7 +1060,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _serverInstance: {fileID: 0}
-  devMode: 0
+  devMode: 1
   generatedSpawnPoint: 0
   instanceId: {fileID: 1141531793}
   DevPanel: {fileID: 306100766}

@@ -5,9 +5,10 @@ using Aptos.BCS;
 using Aptos.HdWallet.Utils;
 using Aptos.Unity.Rest;
 using Aptos.Unity.Rest.Model;
+using Photon.Pun;
 using UnityEngine;
 
-public class EndRaceManager : MonoBehaviour
+public class EndRaceManager : MonoBehaviourPunCallbacks
 {
     public IEnumerator OnEndRace(ulong raceId, List<BString> winningOrder)
     {
@@ -59,8 +60,11 @@ public class EndRaceManager : MonoBehaviour
         Debug.Log(responseInfo.status);
 
         if (responseInfo.status == ResponseInfo.Status.Success)
-        { 
+        {
             //Success
+            WalletManager.Instance._completedRace = true;
+            PlayerPrefs.SetInt("CompletedRace", 1);
+            PhotonNetwork.LoadLevel(0);
             //Switch back to main scene and leave the race for all players
         }
         else Debug.Log(responseInfo.message);
