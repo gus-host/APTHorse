@@ -292,7 +292,7 @@ public class RaceManager : MonoBehaviourPunCallbacks
 
                 winningOrder.Add(new BString(horse.playerProperties.address.Replace("0x", "")));
                 GameObject playerInfo = Instantiate(playerItem.gameObject, _content);
-                playerInfo.GetComponent<PlayerItem>()._playerName.text = rank.ToString() + ". " + horse.playerProperties.color.ToString();
+                playerInfo.GetComponent<PlayerItem>()._playerName.text = rank.ToString() + ". " + horse.GetName();
                 rank++;
             }
             if(PhotonNetwork.IsMasterClient) StartCoroutine(FindObjectOfType<EndRaceManager>().OnEndRace((ulong)WalletManager.Instance.raceId, winningOrder));

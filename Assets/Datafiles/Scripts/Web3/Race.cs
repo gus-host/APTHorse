@@ -39,14 +39,14 @@ public class Race : MonoBehaviourPunCallbacks
     {
         joinRaceButton.onClick.AddListener(() => StartCoroutine(JoinRace()));
         leaveRaceButton.onClick.AddListener(() => StartCoroutine(LeaveRace()));
-        if (PlayerPrefs.HasKey("CompletedRace"))
+       /* if (PlayerPrefs.HasKey("CompletedRace"))
         {
             string compledRace = PlayerPrefs.GetString("CompletedRace");
             if(compledRace == "0"+raceId.ToString())
             {
                 StartCoroutine(LeaveRace());
             }
-        }
+        }*/
         if (inRace && !PhotonNetwork.InRoom && PhotonNetwork.IsConnected)
         {
             JoinArena();
@@ -159,6 +159,11 @@ public class Race : MonoBehaviourPunCallbacks
         } 
         yield return new WaitForSeconds(1);
         AptosUILink.Instance.LoadCurrentWalletBalance();
+        /*if (responseInfo.status == ResponseInfo.Status.Success)
+        {
+            yield return new WaitUntil(()=>WalletManager.Instance._serverInstance!=null);
+            StartCoroutine(WalletManager.Instance.SendEssensData());
+        }*/
     }
 
     private IEnumerator CanStartRace()
@@ -299,6 +304,7 @@ public class Race : MonoBehaviourPunCallbacks
         if (responseInfo.status == ResponseInfo.Status.Success)
         {
             WalletManager.Instance.joinedRaceInfos = new();
+            inRace = false;
             StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
             if (PhotonNetwork.InRoom)
             {

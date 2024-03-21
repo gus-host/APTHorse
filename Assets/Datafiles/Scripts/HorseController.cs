@@ -105,9 +105,16 @@ public class HorseController : MonoBehaviourPunCallbacks
         IdleUpHash = Animator.StringToHash("IdleUp");
         IdleBackwardHash = Animator.StringToHash("IdleBack");
         IdleDownHash = Animator.StringToHash("IdleDown");
-        
+
         //Set to Idle
-        if(playerProperties.color == HorseColor.Green)
+        animator.SetBool(IdleForwardHash, true);
+        animator.SetBool(IdleUpHash, false);
+        animator.SetBool(IdleBackwardHash, false);
+        animator.SetBool(RunStraight, false);
+        animator.SetBool(RunDownHash, false);
+        animator.SetBool(RunUpHash, false);
+
+       /* if (playerProperties.color == HorseColor.Green)
         {
             animator.SetBool(IdleDownHash, true);
             animator.SetBool(IdleForwardHash, false);
@@ -125,9 +132,7 @@ public class HorseController : MonoBehaviourPunCallbacks
             animator.SetBool(RunStraight, false);
             animator.SetBool(RunDownHash, false);
             animator.SetBool(RunUpHash, false);
-        }
-
-        
+        }*/
     }
 
     public void INIT()
@@ -180,7 +185,7 @@ public class HorseController : MonoBehaviourPunCallbacks
             waypoints.SpawnObstacleAtPercentage(_p1, obstacleIndex++);
         }
 
-        if (playerProperties.color == HorseColor.Green)
+/*        if (playerProperties.color == HorseColor.Green)
         {
             animator.SetBool(IdleDownHash, false);
             animator.SetBool(IdleForwardHash, false);
@@ -190,7 +195,7 @@ public class HorseController : MonoBehaviourPunCallbacks
             animator.SetBool(RunDownHash, true);
             animator.SetBool(RunUpHash, false);
         }
-        else{
+        else{*/
             animator.SetBool(IdleDownHash, false);
             animator.SetBool(IdleForwardHash, false);
             animator.SetBool(IdleUpHash, false);
@@ -198,7 +203,7 @@ public class HorseController : MonoBehaviourPunCallbacks
             animator.SetBool(RunStraight, true);
             animator.SetBool(RunDownHash, false);
             animator.SetBool(RunUpHash, false);
-        }
+        /*}*/
     }
 
     IEnumerator Move()
@@ -522,5 +527,10 @@ public class HorseController : MonoBehaviourPunCallbacks
     public void AssignHorseID(int val)
     {
         horseId = val;
+    }
+
+    internal string GetName()
+    {
+        return photonView.Owner.NickName;
     }
 }

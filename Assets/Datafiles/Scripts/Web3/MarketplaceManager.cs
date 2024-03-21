@@ -118,6 +118,7 @@ public class MarketplaceManager : MonoBehaviour
             horseSpeed = WalletManager.Instance.EquippedHorseId == 1000 ? 0 : GetHorseSpeedById(WalletManager.Instance.EquippedHorseId)
         };
         StartCoroutine(WalletManager.Instance.SendEssensData());
+
     }
 
     public int GetHorseSpeedById(int id)
