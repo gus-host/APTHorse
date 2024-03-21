@@ -98,7 +98,7 @@ public class Race : MonoBehaviourPunCallbacks
         spinnerManager.ShowMessage("Joining Race...");
         ResponseInfo responseInfo = new();
 
-        byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
+        byte[] bytes = "f5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c".ByteArrayFromHexString();
         Sequence sequence = new(new ISerializable[] { new U64(raceId) });
 
         var payload = new EntryFunction
@@ -159,7 +159,7 @@ public class Race : MonoBehaviourPunCallbacks
 
         ViewRequest viewRequest = new()
         {
-            Function = "0xdafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead::aptos_horses_game::can_start_race",
+            Function = "0xf5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c::aptos_horses_game::can_start_race",
             TypeArguments = new string[] { },
             Arguments = new string[] { WalletManager.Instance.Wallet.Account.AccountAddress.ToString(), new U64(raceId).ToString() }
         };
@@ -224,7 +224,7 @@ public class Race : MonoBehaviourPunCallbacks
                 else
                 {
                     Debug.LogError("Not In room or Room not full");
-                    WalletManager.Instance._blockchainRoomFull = true;
+                    WalletManager.Instance._blockchainRoomFull = false;
                 }
             }
         }
@@ -250,7 +250,7 @@ public class Race : MonoBehaviourPunCallbacks
         spinnerManager.ShowMessage("Leaving Race...");
         ResponseInfo responseInfo = new();
 
-        byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
+        byte[] bytes = "f5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c".ByteArrayFromHexString();
         Sequence sequence = new(new ISerializable[] { new U64(raceId) });
 
         var payload = new EntryFunction

@@ -74,7 +74,7 @@ public class NFT : MonoBehaviour
 
         ResponseInfo responseInfo = new();
 
-        byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
+        byte[] bytes = "f5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c".ByteArrayFromHexString();
         Sequence sequence = new(new ISerializable[] { new U64(id) });
 
         var payload = new EntryFunction
@@ -127,7 +127,7 @@ public class NFT : MonoBehaviour
         spinnerManager.ShowMessage($"{(equip_id == 1000 ? "Unequipping" : "Equipping")} {nftNameText.text}...");
         ResponseInfo responseInfo = new();
 
-        byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
+        byte[] bytes = "f5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c".ByteArrayFromHexString();
         Sequence sequence = new(new ISerializable[] { new U64(equip_id == 10000000 ? id : equip_id) });
 
         var payload = new EntryFunction

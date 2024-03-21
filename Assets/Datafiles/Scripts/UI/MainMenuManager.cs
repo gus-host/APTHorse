@@ -40,7 +40,7 @@ public class MainMenuManager : MonoBehaviour
 
         ViewRequest viewRequest = new()
         {
-            Function = "0xdafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead::aptos_horses_user::get_username",
+            Function = "0xf5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c::aptos_horses_user::get_username",
             TypeArguments = new string[] { },
             Arguments = new string[] { WalletManager.Instance.Wallet.Account.AccountAddress.ToString() }
         };
@@ -62,7 +62,6 @@ public class MainMenuManager : MonoBehaviour
             WalletManager.Instance.UpdateUsername();
             InfoPanel.SetActive(true);
             MarketplaceButton.SetActive(true);
-            //RacesButton.SetActive(true);
             yield return StartCoroutine(FindObjectOfType<MarketplaceManager>().GetMarketplaceDataAsync());
             StartCoroutine(FindObjectOfType<RaceObjectManager>().GetRaceDataAsync());
         }
@@ -85,7 +84,7 @@ public class MainMenuManager : MonoBehaviour
         spinnerManager.ShowMessage("Creating User...");
         ResponseInfo responseInfo = new();
 
-        byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
+        byte[] bytes = "f5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c".ByteArrayFromHexString();
         Sequence sequence = new(new ISerializable[] { new BString(username) });
 
         EntryFunction payload = new(
@@ -132,7 +131,7 @@ public class MainMenuManager : MonoBehaviour
         spinnerManager.ShowMessage("Updating Username...");
         ResponseInfo responseInfo = new();
 
-        byte[] bytes = "dafe19420f798da33a13a5928202ee55f812b1d4666aad6e0f66dedd6daefead".ByteArrayFromHexString();
+        byte[] bytes = "f5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c".ByteArrayFromHexString();
         Sequence sequence = new(new ISerializable[] { new BString(username) });
 
         EntryFunction payload = new(
