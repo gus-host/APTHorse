@@ -276,10 +276,10 @@ public class RaceManager : MonoBehaviourPunCallbacks
         {
             Debug.LogError(horse.playerProperties.color);
         }
-        if (horses.Count>4)
+        if (horses.Count == PhotonNetwork.CurrentRoom.PlayerCount)
         {
             ResultPanel.SetActive(true);
-            while (horses.Count>0 && horses.Count < 6)
+            while (horses.Count>0 && horses.Count <= PhotonNetwork.CurrentRoom.PlayerCount)
             { 
                 _horseRanks.Add(horses.Pop());
             }
@@ -288,11 +288,12 @@ public class RaceManager : MonoBehaviourPunCallbacks
             List<BString> winningOrder = new();
             foreach (var horse in _horseRanks)
             {
-                if (rank > 5) break;
+                if (rank > PhotonNetwork.CurrentRoom.PlayerCount) break;
 
                 winningOrder.Add(new BString(horse.playerProperties.address.Replace("0x", "")));
                 GameObject playerInfo = Instantiate(playerItem.gameObject, _content);
                 playerInfo.GetComponent<PlayerItem>()._playerName.text = rank.ToString() + ". " + horse.GetName();
+                playerInfo.GetComponent<PlayerItem>()._aptReward.text = "xx";
                 rank++;
             }
             if(PhotonNetwork.IsMasterClient) StartCoroutine(FindObjectOfType<EndRaceManager>().OnEndRace((ulong)WalletManager.Instance.raceId, winningOrder));

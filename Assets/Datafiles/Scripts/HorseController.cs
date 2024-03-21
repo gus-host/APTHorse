@@ -46,6 +46,8 @@ public class HorseController : MonoBehaviourPunCallbacks
     public int totalLap = 1;
     public int lapLeft = 1;
 
+    public Transform[] OopsSpts; 
+
     //4-6
     public float _maxSpeed = 5f;
     public float _minSpeed = 0;
@@ -65,6 +67,7 @@ public class HorseController : MonoBehaviourPunCallbacks
     public bool _InUpRange;
     public bool _InDownRange;
     public bool lapReductionProcessed = false;
+    public bool _gameStarted = false;
 
     float accelerationInput = 0f;
 
@@ -178,9 +181,9 @@ public class HorseController : MonoBehaviourPunCallbacks
 
     public void StartRace()
     {
+        _gameStarted = true;
         StartCoroutine(Move());
-        
-        if (obstacleIndex == 0)
+        if (obstacleIndex == 0 && photonView.IsMine)
         {
             waypoints.SpawnObstacleAtPercentage(_p1, obstacleIndex++);
         }
@@ -283,6 +286,136 @@ public class HorseController : MonoBehaviourPunCallbacks
         waypoints = wp;
     }
 
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (!_gameStarted) return;
+
+        if (_gameEnded) {
+
+            if (_InForwardRange)
+            {
+                animator.SetBool(IdleForwardHash, true);
+                animator.SetBool(IdleUpHash, false);
+                animator.SetBool(IdleDownHash, false);
+                animator.SetBool(IdleBackwardHash, false);
+                animator.SetBool(RunStraight, false);
+                animator.SetBool(RunDownHash, false);
+                animator.SetBool(RunUpHash, false);
+                animator.SetBool(IdleForwardHash, false);
+            }else if (_InDownRange)
+            {
+                animator.SetBool(IdleForwardHash, false);
+                animator.SetBool(IdleUpHash, false);
+                animator.SetBool(IdleDownHash, true);
+                animator.SetBool(IdleBackwardHash, false);
+                animator.SetBool(RunStraight, false);
+                animator.SetBool(RunDownHash, false);
+                animator.SetBool(RunUpHash, false);
+                animator.SetBool(IdleForwardHash, false);
+            }else if (_InBackwardRange)
+            {
+                animator.SetBool(IdleForwardHash, false);
+                animator.SetBool(IdleUpHash, false);
+                animator.SetBool(IdleDownHash, false);
+                animator.SetBool(IdleBackwardHash, true);
+                animator.SetBool(RunStraight, false);
+                animator.SetBool(RunDownHash, false);
+                animator.SetBool(RunUpHash, false);
+                animator.SetBool(IdleForwardHash, false);
+            }
+            else if (_InUpRange)
+            {
+                animator.SetBool(IdleForwardHash, false);
+                animator.SetBool(IdleUpHash, true);
+                animator.SetBool(IdleDownHash, false);
+                animator.SetBool(IdleBackwardHash, false);
+                animator.SetBool(RunStraight, false);
+                animator.SetBool(RunDownHash, false);
+                animator.SetBool(RunUpHash, false);
+                animator.SetBool(IdleForwardHash, false);
+            }
+            return;
+        } 
+        
+        if (collision.gameObject.CompareTag("Start"))
+        {
+            animator.SetBool(IdleForwardHash, false);
+            animator.SetBool(IdleUpHash, false);
+            animator.SetBool(IdleDownHash, false);
+            animator.SetBool(IdleBackwardHash, false);
+            animator.SetBool(RunStraight, true);
+            animator.SetBool(RunDownHash, false);
+            animator.SetBool(RunUpHash, false);
+            animator.SetBool(IdleForwardHash, false);
+        }
+        else if (collision.gameObject.CompareTag("First"))
+        {
+            animator.SetBool(IdleForwardHash, false);
+            animator.SetBool(IdleUpHash, false);
+            animator.SetBool(IdleDownHash, false);
+            animator.SetBool(IdleBackwardHash, false);
+            animator.SetBool(RunDownHash, true);
+            animator.SetBool(RunStraight, false);
+            animator.SetBool(RunUpHash, false);
+            animator.SetBool(IdleForwardHash, false);
+
+            _InDownRange = true;
+            _InBackwardRange = false;
+            _InForwardRange = false;
+            _InUpRange = false;
+        }
+        else if (collision.gameObject.CompareTag("Second"))
+        {
+            animator.SetBool(IdleForwardHash, false);
+            animator.SetBool(IdleUpHash, false);
+            animator.SetBool(IdleDownHash, false);
+            animator.SetBool(IdleBackwardHash, false);
+            animator.SetBool(RunStraight, true);
+            animator.SetBool(RunDownHash, false);
+            animator.SetBool(RunUpHash, false);
+            animator.SetBool(IdleForwardHash, false);
+            spriteRenderer.flipX = true;
+
+            _InDownRange = false;
+            _InBackwardRange = true;
+            _InForwardRange = false;
+            _InUpRange = false;
+        }
+        else if (collision.gameObject.CompareTag("Third"))
+        {
+            animator.SetBool(IdleForwardHash, false);
+            animator.SetBool(IdleUpHash, false);
+            animator.SetBool(IdleDownHash, false);
+            animator.SetBool(IdleBackwardHash, false);
+            animator.SetBool(RunUpHash, true);
+            animator.SetBool(RunDownHash, false);
+            animator.SetBool(RunStraight, false);
+            animator.SetBool(IdleForwardHash, false);
+
+            _InDownRange = false;
+            _InBackwardRange = false;
+            _InForwardRange = false;
+            _InUpRange = true;
+        }
+        else if (collision.gameObject.CompareTag("Fourth"))
+        {
+            animator.SetBool(IdleForwardHash, false);
+            animator.SetBool(IdleUpHash, false);
+            animator.SetBool(IdleDownHash, false);
+            animator.SetBool(IdleBackwardHash, false);
+            animator.SetBool(RunStraight, true);
+            animator.SetBool(RunUpHash, false);
+            animator.SetBool(RunDownHash, false);
+            animator.SetBool(IdleForwardHash, false);
+            spriteRenderer.flipX = false;
+
+            _InDownRange = false;
+            _InBackwardRange = false;
+            _InForwardRange = true;
+            _InUpRange = false;
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
 
@@ -368,6 +501,11 @@ public class HorseController : MonoBehaviourPunCallbacks
         else if (collision.gameObject.CompareTag("Puddle"))
         {
             currentSpeed = _minSpeed;
+            if (photonView.IsMine)
+            {
+                var puddleReaction = PhotonNetwork.Instantiate("OOPS", OopsSpts[UnityEngine.Random.Range(0, OopsSpts.Length)].position, Quaternion.identity);
+                Destroy( puddleReaction, 3f);
+            }
             Destroy(collision.gameObject);
         }
         #endregion
@@ -451,10 +589,10 @@ public class HorseController : MonoBehaviourPunCallbacks
         {
             lapLeft--;
             lapReductionProcessed = true;
-            if (obstacleIndex == 1)
+            if (obstacleIndex == 1 && photonView.IsMine)
             {
                 waypoints.SpawnObstacleAtPercentage(_p2, obstacleIndex++);
-            }else if(obstacleIndex == 2)
+            }else if(obstacleIndex == 2 && photonView.IsMine)
             {
                 waypoints.SpawnObstacleAtPercentage(_p3, obstacleIndex++);
             }
