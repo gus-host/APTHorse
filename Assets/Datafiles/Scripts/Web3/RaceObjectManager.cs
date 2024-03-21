@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Aptos.Unity.Rest;
 using Aptos.Unity.Rest.Model;
 using SimpleJSON;
@@ -8,6 +9,8 @@ public class RaceObjectManager : MonoBehaviour
 {
     public Race raceGo;
     public Transform raceSpawn;
+
+    private List<Race> races = new();
 
     public IEnumerator GetRaceDataAsync()
     {
@@ -38,14 +41,10 @@ public class RaceObjectManager : MonoBehaviour
     {
         JSONNode node = JSON.Parse(data);
 
-        foreach (Transform t in raceSpawn)
-        {
-            Destroy(t.gameObject);
-        }
-
         for (int i = 0; i < node[0].Count; i++)
         {
-            Instantiate(raceGo, raceSpawn).SetupRace(
+            if (races.Count < i + 1) races.Add(Instantiate(raceGo, raceSpawn));
+            races[i].SetupRace(
                 node[0][i]["race_id"].AsULong,
                 node[0][i]["name"].Value,
                 node[0][i]["price"].AsInt,
