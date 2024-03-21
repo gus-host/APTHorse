@@ -1116,6 +1116,8 @@ MonoBehaviour:
   _canSwitch: 0
   _createdServerInstance: 0
   _playerInfoAdded: 0
+  _inRace: 0
+  _blockchainRoomFull: 0
 --- !u!4 &227476187
 Transform:
   m_ObjectHideFlags: 0
