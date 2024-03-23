@@ -73,6 +73,7 @@ public class HorseController : MonoBehaviourPunCallbacks
     public bool _InDownRange;
     public bool lapReductionProcessed = false;
     public bool _gameStarted = false;
+    public bool _loadingMain = false;
 
     float accelerationInput = 0f;
 
@@ -753,7 +754,11 @@ public class HorseController : MonoBehaviourPunCallbacks
             raceManager.FadeToastOut();
             yield return new WaitForSecondsRealtime(1f);
         }
-        PhotonNetwork.LoadLevel(0);
+        if(!_loadingMain)
+        {
+            PhotonNetwork.LoadLevel(0);
+            _loadingMain = true;
+        }
     }
 
     public void RPCGetResults()

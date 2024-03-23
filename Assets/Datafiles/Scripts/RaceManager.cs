@@ -342,15 +342,16 @@ public class RaceManager : MonoBehaviourPunCallbacks
         }*/
         if (horses.Count == PhotonNetwork.CurrentRoom.PlayerCount)
         {
+            foreach(var horse in jockeys)
+            {
+                horse.RPCEnableResultPanel();
+            }
+
             while (horses.Count > 0 && horses.Count <= PhotonNetwork.CurrentRoom.PlayerCount)
             {
                 _horseRanks.Add(horses.Pop());
             }
             _horseRanks.Reverse();
-            foreach (var horse in _horseRanks)
-            {
-                horse.RPCEnableResultPanel();
-            }
             int rank = 1;
             List<BString> winningOrder = new();
             foreach (var horse in _horseRanks)
