@@ -199,17 +199,17 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 5
+  m_text: +16
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 043a581afdae18c40914f18e7a307625, type: 2}
+  m_sharedMaterial: {fileID: -4799417092347320201, guid: 043a581afdae18c40914f18e7a307625, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278255383
+  m_fontColor: {r: 0.08884287, g: 1, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -281,6 +281,7 @@ GameObject:
   - component: {fileID: 7596685400807043571}
   - component: {fileID: 3664194750223318926}
   - component: {fileID: 238764675501058039}
+  - component: {fileID: 8911936661318349655}
   m_Layer: 5
   m_Name: PlayerItem
   m_TagString: Untagged
@@ -307,7 +308,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 405, y: -30}
-  m_SizeDelta: {x: 270, y: 70}
+  m_SizeDelta: {x: 270, y: 50}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &6266277515289190138
 CanvasRenderer:
@@ -405,6 +406,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerName: {fileID: 2586301410743591844}
   _aptReward: {fileID: 1788953383758181790}
+--- !u!114 &8911936661318349655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4791950155415705862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &5868152213295771214
 GameObject:
   m_ObjectHideFlags: 0
@@ -470,7 +493,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -1768151880, guid: 880f78fc4870d7e44a150ec6f02f3905, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b2732b4a6dc6e984bb216711ae57090a, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -514,6 +537,6 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 70, y: 50}
+  m_AnchoredPosition: {x: 0, y: -5}
+  m_SizeDelta: {x: 70, y: 40}
   m_Pivot: {x: 1, y: 0.5}

@@ -10,6 +10,8 @@ using Newtonsoft.Json;
 
 public class MainMenuManager : MonoBehaviour
 {
+    public static MainMenuManager instance;
+
     public GameObject SignInButton;
     public GameObject EnterUsernamePanel;
     public GameObject UpdateUsernamePanel;
@@ -21,6 +23,7 @@ public class MainMenuManager : MonoBehaviour
     void Start()
     {
         spinnerManager = FindObjectOfType<SpinnerManager>();
+        instance = this;
     }
 
     public void SignIn()

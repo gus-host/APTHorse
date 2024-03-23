@@ -2,7 +2,10 @@ using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.WSA;
 
 public enum HorseColor
 {
@@ -30,6 +33,8 @@ public class HorseController : MonoBehaviourPunCallbacks
     public WayPointList waypoints;
     public Animator animator;
     public SpriteRenderer spriteRenderer;
+    GameObject puddleReactionInstance;
+    GameObject celebrateInstance;
     public float _p1;
     public float _p2;
     public float _p3;
@@ -188,25 +193,13 @@ public class HorseController : MonoBehaviourPunCallbacks
             waypoints.SpawnObstacleAtPercentage(_p1, obstacleIndex++);
         }
 
-/*        if (playerProperties.color == HorseColor.Green)
-        {
-            animator.SetBool(IdleDownHash, false);
-            animator.SetBool(IdleForwardHash, false);
-            animator.SetBool(IdleUpHash, false);
-            animator.SetBool(IdleBackwardHash, false);
-            animator.SetBool(RunStraight, false);
-            animator.SetBool(RunDownHash, true);
-            animator.SetBool(RunUpHash, false);
-        }
-        else{*/
-            animator.SetBool(IdleDownHash, false);
-            animator.SetBool(IdleForwardHash, false);
-            animator.SetBool(IdleUpHash, false);
-            animator.SetBool(IdleBackwardHash, false);
-            animator.SetBool(RunStraight, true);
-            animator.SetBool(RunDownHash, false);
-            animator.SetBool(RunUpHash, false);
-        /*}*/
+        animator.SetBool(IdleDownHash, false);
+        animator.SetBool(IdleForwardHash, false);
+        animator.SetBool(IdleUpHash, false);
+        animator.SetBool(IdleBackwardHash, false);
+        animator.SetBool(RunStraight, true);
+        animator.SetBool(RunDownHash, false);
+        animator.SetBool(RunUpHash, false);
     }
 
     IEnumerator Move()
@@ -503,8 +496,8 @@ public class HorseController : MonoBehaviourPunCallbacks
             currentSpeed = _minSpeed;
             if (photonView.IsMine)
             {
-                var puddleReaction = PhotonNetwork.Instantiate("OOPS", OopsSpts[UnityEngine.Random.Range(0, OopsSpts.Length)].position, Quaternion.identity);
-                Destroy( puddleReaction, 3f);
+                puddleReactionInstance = PhotonNetwork.Instantiate("OOPS", OopsSpts[UnityEngine.Random.Range(0, OopsSpts.Length)].position, Quaternion.identity);
+                StartCoroutine(RPCDestroy());
             }
             Destroy(collision.gameObject);
         }
@@ -514,6 +507,39 @@ public class HorseController : MonoBehaviourPunCallbacks
             && collision.gameObject.CompareTag("Finished"))
         {
             ReduceLapandUpdateCheckpoint(onEnterDisableCollider);
+            photonView.RPC("SpawnCelebrate", RpcTarget.AllViaServer);
+        }
+    }
+
+
+    [PunRPC]
+    private void SpawnCelebrate()
+    {
+        if (photonView.IsMine && celebrateInstance == null)
+        {
+            celebrateInstance = PhotonNetwork.Instantiate("Celebrate", OopsSpts[UnityEngine.Random.Range(0, OopsSpts.Length)].position, Quaternion.identity);
+           
+            StartCoroutine(RPCDestroyCelebrate());
+        }
+    }
+
+    IEnumerator RPCDestroy()
+    {
+        yield return new WaitForSecondsRealtime(0.1f);
+        if (puddleReactionInstance != null)
+        {
+            LeanTween.scale(puddleReactionInstance, new Vector3(0, 0, 0), 2.5f);
+        }
+        yield return new WaitForSecondsRealtime(3f);
+        photonView.RPC("Destroy", RpcTarget.AllViaServer);
+    }
+
+    [PunRPC]
+    void Destroy()
+    {
+        if(puddleReactionInstance != null)
+        {
+            PhotonNetwork.Destroy(puddleReactionInstance);
         }
     }
 
@@ -534,6 +560,7 @@ public class HorseController : MonoBehaviourPunCallbacks
             _canMove = false;
             _running = false;
             _raceFinished = true;
+            RpcCompletedRace();
             if (_InForwardRange)
             {
                 animator.SetBool(IdleForwardHash, true);
@@ -577,6 +604,17 @@ public class HorseController : MonoBehaviourPunCallbacks
         }
     }
 
+    private void RpcCompletedRace()
+    {
+        photonView.RPC("CompletedRace", RpcTarget.AllViaServer);
+    }
+
+    [PunRPC]
+    private void CompletedRace()
+    {
+        WalletManager.Instance._completedRace = true;
+    }
+
     [PunRPC]
     public void RPCReduceLapandUpdateCheckpoint()
     {
@@ -596,9 +634,26 @@ public class HorseController : MonoBehaviourPunCallbacks
             {
                 waypoints.SpawnObstacleAtPercentage(_p3, obstacleIndex++);
             }
+            
         }
         photonView.RPC("SetLapReductionProcessed", RpcTarget.All, true);
         photonView.RPC("RPCDelayLapReductionProcessed", RpcTarget.All, true);
+    }
+
+    IEnumerator RPCDestroyCelebrate()
+    {
+        if (celebrateInstance == null) yield return null;
+        LeanTween.scale(celebrateInstance, new Vector3(0, 0, 0), 3f);
+        yield return new WaitForSecondsRealtime(3f);
+        DestroyCelebrate();
+    }
+
+    public void DestroyCelebrate()
+    {
+        if (celebrateInstance != null)
+        {
+            PhotonNetwork.Destroy(celebrateInstance);
+        }
     }
 
     [PunRPC]
@@ -670,5 +725,85 @@ public class HorseController : MonoBehaviourPunCallbacks
     internal string GetName()
     {
         return photonView.Owner.NickName;
+    }
+
+    public void HeadBackInit()
+    {
+         RPCLeaveRace();
+    }
+    public void RPCLeaveRace()
+    {
+        photonView.RPC("LeaveRaceFromAll", RpcTarget.All);
+    }
+
+    [PunRPC]
+    private void LeaveRaceFromAll()
+    {
+        StartCoroutine(HeadBack());
+        WalletManager.Instance._headingBack = true;
+    }
+
+    private IEnumerator HeadBack()
+    {
+        for (int i = 10; i >= 1; i--)
+        {
+            raceManager.SetToastText($"Heading back in {i}");
+            raceManager.FadeToastIn();
+            yield return new WaitForSecondsRealtime(1f);
+            raceManager.FadeToastOut();
+            yield return new WaitForSecondsRealtime(1f);
+        }
+        PhotonNetwork.LoadLevel(0);
+    }
+
+    public void RPCGetResults()
+    {
+        photonView.RPC("GetResults", RpcTarget.AllViaServer);
+    }
+
+    [PunRPC]
+    private async void GetResults()
+    {
+        UnityWebRequest request =
+        await raceManager.getResultsGraphql.Post("query MyQuery {\r\n  coin_activities(\r\n    where: {owner_address: {_eq: \"0xf5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c\"}, _and: {entry_function_id_str: {_eq: \"0xf5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c::aptos_horses_game::on_race_end\"}}}\r\n    limit: 5\r\n    order_by: {block_height: desc, amount: desc}\r\n  ) {\r\n    amount\r\n    transaction_version\r\n    event_index\r\n  }\r\n}");
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            string data = request.downloadHandler.text;
+            Debug.LogError($"Data for rewards {data}");
+            if (!string.IsNullOrEmpty(data))
+            {
+                CoinActivitiesResponse response = JsonUtility.FromJson<CoinActivitiesResponse>(data);
+                var tempIndex = 0;
+                if (response != null && response.data != null && response.data.coin_activities != null)
+                {
+                    foreach (CoinActivity activity in response.data.coin_activities)
+                    {
+                        Debug.Log("Amount: " + activity.amount / 100000000);
+                        raceManager._playerItemInstances[tempIndex++]._aptReward.text = "+" + (activity.amount / 100000000).ToString();
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Failed to deserialize JSON or JSON data is empty");
+                }
+
+            }
+        }
+        else
+        {
+            Debug.LogError("Request failed: " + request.error);
+        }
+    }
+
+    public void RPCEnableResultPanel()
+    {
+        photonView.RPC("EnableResultPanel", RpcTarget.All);
+    }
+
+    [PunRPC]
+    private void EnableResultPanel()
+    {
+        raceManager.ResultPanel.SetActive(true);
     }
 }

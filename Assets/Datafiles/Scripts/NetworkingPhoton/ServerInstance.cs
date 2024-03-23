@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ServerInstance : MonoBehaviourPunCallbacks
 {
@@ -12,6 +13,7 @@ public class ServerInstance : MonoBehaviourPunCallbacks
     public static ServerInstance Instance;
     public int spawnPoint;
     private SpinnerManager spinnner;
+    
 
     private void Start()
     {
@@ -28,7 +30,7 @@ public class ServerInstance : MonoBehaviourPunCallbacks
         }
         spinnner.ShowMessage("Loading race");
         Debug.LogError("InitSceneSwitch");
-        Task.Delay(3000);
+        Task.Delay(10000);
         photonView.RPC("SwitchToRace", RpcTarget.All);
         return;
     }
@@ -156,24 +158,5 @@ public class ServerInstance : MonoBehaviourPunCallbacks
     {
         Debug.LogError("MakeBlockchainRoomFull");
         WalletManager.Instance._blockchainRoomFull = val;
-    }
-
-    internal void RPCLeaveRace(bool v)
-    {
-        photonView.RPC("LeaveRace", RpcTarget.AllBuffered, v);
-    }
-
-    [PunRPC]
-    public void LeaveRace(bool v)
-    {
-        Race[] _races = FindObjectsOfType<Race>();
-        foreach (var race in _races)
-        {
-            if ((int)race.raceId == WalletManager.Instance.raceId)
-            {
-                StartCoroutine(race.LeaveRace());
-                WalletManager.Instance._completedRace = false;
-            }
-        }
     }
 }

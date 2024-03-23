@@ -63,8 +63,8 @@ public class EndRaceManager : MonoBehaviourPunCallbacks
         {
             //Success
             WalletManager.Instance._completedRace = true;
+            RaceManager.instance._completedRace = true;
             PlayerPrefs.SetInt("CompletedRace", 1);
-            PhotonNetwork.LoadLevel(0);
             //Switch back to main scene and leave the race for all players
         }
         else Debug.Log(responseInfo.message);
