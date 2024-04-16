@@ -10,6 +10,8 @@ using Newtonsoft.Json;
 
 public class MainMenuManager : MonoBehaviour
 {
+    public static MainMenuManager instance;
+
     public GameObject SignInButton;
     public GameObject EnterUsernamePanel;
     public GameObject UpdateUsernamePanel;
@@ -21,6 +23,7 @@ public class MainMenuManager : MonoBehaviour
     void Start()
     {
         spinnerManager = FindObjectOfType<SpinnerManager>();
+        instance = this;
     }
 
     public void SignIn()
@@ -40,7 +43,7 @@ public class MainMenuManager : MonoBehaviour
 
         ViewRequest viewRequest = new()
         {
-            Function = "0xf5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c::aptos_horses_user::get_username",
+            Function = "0x3e79e6c4f4d55299f09b3aef9a8ba33a2ba0f53d081336c3811c3e4712a8d48b::aptos_horses_user::get_username",
             TypeArguments = new string[] { },
             Arguments = new string[] { WalletManager.Instance.Wallet.Account.AccountAddress.ToString() }
         };
@@ -84,7 +87,7 @@ public class MainMenuManager : MonoBehaviour
         spinnerManager.ShowMessage("Creating User...");
         ResponseInfo responseInfo = new();
 
-        byte[] bytes = "f5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c".ByteArrayFromHexString();
+        byte[] bytes = "3e79e6c4f4d55299f09b3aef9a8ba33a2ba0f53d081336c3811c3e4712a8d48b".ByteArrayFromHexString();
         Sequence sequence = new(new ISerializable[] { new BString(username) });
 
         EntryFunction payload = new(
@@ -131,7 +134,7 @@ public class MainMenuManager : MonoBehaviour
         spinnerManager.ShowMessage("Updating Username...");
         ResponseInfo responseInfo = new();
 
-        byte[] bytes = "f5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c".ByteArrayFromHexString();
+        byte[] bytes = "3e79e6c4f4d55299f09b3aef9a8ba33a2ba0f53d081336c3811c3e4712a8d48b".ByteArrayFromHexString();
         Sequence sequence = new(new ISerializable[] { new BString(username) });
 
         EntryFunction payload = new(

@@ -5,10 +5,14 @@ using System.Threading;
 using Aptos.HdWallet;
 using Aptos.Unity.Rest;
 using Aptos.Unity.Sample.UI;
+using GraphQlClient.Core;
 using Photon.Pun;
+using SimpleJSON;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 [Serializable]
 public class JoinedRaceInfo
@@ -40,7 +44,10 @@ public class RacePlayer : ISerializationCallbackReceiver
 public class WalletManager : MonoBehaviourPunCallbacks
 {
     public static WalletManager Instance { get; private set; }
+
     public GameObject _serverInstance;
+    public GameObject _restartNote;
+    
     //DEV USE ONLY - InstanceID
     public bool devMode = false;
     public bool generatedSpawnPoint = false;
@@ -83,6 +90,9 @@ public class WalletManager : MonoBehaviourPunCallbacks
     public bool _inRace = false;
     public bool _blockchainRoomFull = false;
     public bool _completedRace = false;
+    public bool _headingBack = false;
+
+    [SerializeField] private GraphApi getResultsGraphql;
 
     void Awake()
     {
@@ -96,7 +106,7 @@ public class WalletManager : MonoBehaviourPunCallbacks
 
     void Start()
     {
-        //PlayerPrefs.DeleteAll();
+        PlayerPrefs.DeleteAll();
         PlayerPrefs.DeleteKey("PlayerId");
         PlayerPrefs.DeleteKey("PlayerId1");
         PlayerPrefs.DeleteKey("PlayerId2");
@@ -131,12 +141,14 @@ public class WalletManager : MonoBehaviourPunCallbacks
                 race._createdServerInstance = _createdServerInstance;
             }
         }
-        if (_completedRace)
+
+        if(_completedRace && _headingBack)
         {
-            int sceneBuildIndex = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
-            if (sceneBuildIndex == 0)
+            int index = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
+            if(index == 0)
             {
-                _serverInstance.GetComponent<ServerInstance>().RPCLeaveRace(true);
+                MainMenuManager.instance.SignInButton.SetActive(false);
+                _restartNote.SetActive(true);
             }
         }
 
@@ -329,12 +341,21 @@ public class WalletManager : MonoBehaviourPunCallbacks
         }
     }
 
-    private void OnDestroy()
+    private void OnApplicationQuit()
+    {
+        /*Race[] _races = FindObjectsOfType<Race>();
+        foreach (var race in _races)
+        {
+            StartCoroutine(race.LeaveRace());
+        }*/
+    }
+
+    /*async OnDestroy()
     {
         Race[] _races = FindObjectsOfType<Race>();
         foreach (var race in _races)
         {
             StartCoroutine(race.LeaveRace());
         }
-    }
+    }*/
 }

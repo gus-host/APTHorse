@@ -59,6 +59,9 @@ TagManager:
   - name: Checkpoints
     uniqueID: 349471195
     locked: 0
+  - name: OOPS
+    uniqueID: 402891765
+    locked: 0
   - name: Player
     uniqueID: 1907650697
     locked: 0

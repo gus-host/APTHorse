@@ -1,4 +1,5 @@
 using Photon.Pun;
+using TMPro;
 using UnityEngine;
 
 public class OnEnterDisableCollider : MonoBehaviourPunCallbacks, IPunObservable
@@ -8,9 +9,22 @@ public class OnEnterDisableCollider : MonoBehaviourPunCallbacks, IPunObservable
    public Transform []_nextCheckpoint;
    public bool _turnOnOrOff=false;
 
-    public int checkpointIndex = 0;
+   public int checkpointIndex = 0;
 
-   private void OnTriggerEnter(Collider other)
+    public TMP_Text _text;
+
+    private void Start()
+    {
+        _text.text = (checkpointIndex + 1).ToString();
+        LeanTween.scale(_text.gameObject, new Vector3(0, 0, 0), 2)
+            .setEaseInElastic()
+            .setLoopPingPong().setOnComplete(() => {
+               /* LeanTween.scale(_text.gameObject, new Vector3(1, 1, 1), 2)
+            .setEaseInElastic()
+            .setLoopPingPong();*/ });
+    }
+
+    private void OnTriggerEnter(Collider other)
    {
       if (other.gameObject.CompareTag(Tags.PLAYER_TAG))
       {
@@ -70,6 +84,7 @@ public class OnEnterDisableCollider : MonoBehaviourPunCallbacks, IPunObservable
         if(checkpointIndex < _nextCheckpoint.Length )
         {
             transform.position = _nextCheckpoint[checkpointIndex++].transform.localPosition;
+            _text.text = (checkpointIndex+1).ToString();
         }
     }
 

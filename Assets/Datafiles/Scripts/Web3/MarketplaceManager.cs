@@ -26,7 +26,7 @@ public class MarketplaceManager : MonoBehaviour
 
         ViewRequest viewRequest = new()
         {
-            Function = "0xf5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c::aptos_horses::get_all_metadata",
+            Function = "0x3e79e6c4f4d55299f09b3aef9a8ba33a2ba0f53d081336c3811c3e4712a8d48b::aptos_horses::get_all_metadata",
             TypeArguments = new string[] { },
             Arguments = new string[] { }
         };
@@ -51,7 +51,7 @@ public class MarketplaceManager : MonoBehaviour
 
         ViewRequest viewRequest = new()
         {
-            Function = "0xf5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c::aptos_horses_user::get_equiped_horse",
+            Function = "0x3e79e6c4f4d55299f09b3aef9a8ba33a2ba0f53d081336c3811c3e4712a8d48b::aptos_horses_user::get_equiped_horse",
             TypeArguments = new string[] { },
             Arguments = new string[] { WalletManager.Instance.Wallet.Account.AccountAddress.ToString() }
         };
@@ -118,6 +118,7 @@ public class MarketplaceManager : MonoBehaviour
             horseSpeed = WalletManager.Instance.EquippedHorseId == 1000 ? 0 : GetHorseSpeedById(WalletManager.Instance.EquippedHorseId)
         };
         StartCoroutine(WalletManager.Instance.SendEssensData());
+
     }
 
     public int GetHorseSpeedById(int id)
