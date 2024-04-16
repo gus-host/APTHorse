@@ -106,7 +106,7 @@ public class WalletManager : MonoBehaviourPunCallbacks
 
     void Start()
     {
-        //PlayerPrefs.DeleteAll();
+        PlayerPrefs.DeleteAll();
         PlayerPrefs.DeleteKey("PlayerId");
         PlayerPrefs.DeleteKey("PlayerId1");
         PlayerPrefs.DeleteKey("PlayerId2");
@@ -341,12 +341,21 @@ public class WalletManager : MonoBehaviourPunCallbacks
         }
     }
 
-    private void OnDestroy()
+    private void OnApplicationQuit()
+    {
+        /*Race[] _races = FindObjectsOfType<Race>();
+        foreach (var race in _races)
+        {
+            StartCoroutine(race.LeaveRace());
+        }*/
+    }
+
+    /*async OnDestroy()
     {
         Race[] _races = FindObjectsOfType<Race>();
         foreach (var race in _races)
         {
             StartCoroutine(race.LeaveRace());
         }
-    }
+    }*/
 }

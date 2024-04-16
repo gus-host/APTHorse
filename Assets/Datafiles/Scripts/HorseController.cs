@@ -769,7 +769,7 @@ public class HorseController : MonoBehaviourPunCallbacks
     private async void GetResults()
     {
         UnityWebRequest request =
-        await raceManager.getResultsGraphql.Post("query MyQuery {\r\n  coin_activities(\r\n    where: {owner_address: {_eq: \"0xf5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c\"}, _and: {entry_function_id_str: {_eq: \"0xf5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c::aptos_horses_game::on_race_end\"}}}\r\n    limit: 5\r\n    order_by: {block_height: desc, amount: desc}\r\n  ) {\r\n    amount\r\n    transaction_version\r\n    event_index\r\n  }\r\n}");
+        await raceManager.getResultsGraphql.Post("query MyQuery {\r\n  coin_activities(\r\n    where: {owner_address: {_eq: \"0x3e79e6c4f4d55299f09b3aef9a8ba33a2ba0f53d081336c3811c3e4712a8d48b\"}, _and: {entry_function_id_str: {_eq: \"0x3e79e6c4f4d55299f09b3aef9a8ba33a2ba0f53d081336c3811c3e4712a8d48b::aptos_horses_game::on_race_end\"}}}\r\n    limit: 5\r\n    order_by: {block_height: desc, amount: desc}\r\n  ) {\r\n    amount\r\n    transaction_version\r\n    event_index\r\n  }\r\n}");
 
         if (request.result == UnityWebRequest.Result.Success)
         {

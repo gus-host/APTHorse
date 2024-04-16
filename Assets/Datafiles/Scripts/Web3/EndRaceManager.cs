@@ -15,7 +15,7 @@ public class EndRaceManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(5);
         ResponseInfo responseInfo = new();
         
-        byte[] bytes = "f5ba4eeade1e3505128e8e7ed36cb147aa4c1fb53ce5a11074ec32dd9f40195c".ByteArrayFromHexString();
+        byte[] bytes = "3e79e6c4f4d55299f09b3aef9a8ba33a2ba0f53d081336c3811c3e4712a8d48b".ByteArrayFromHexString();
         Sequence sequence = new(new ISerializable[] 
         { 
             new U64(raceId), 
