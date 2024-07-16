@@ -1,7 +1,5 @@
 # APTHorse
 
-[VIEW YOUTUBE DEMO HERE](https://youtu.be/wsc0hfwsFBc)
-
 **Multiplayer On-chain Horse Racing game powered by Aptos Random Roll Mint your destined APThorse powered by random acceleration, velocity & hurdles and challenge your friends and top the leaderboards**
 <img width="1192" alt="Screenshot 2024-03-23 at 12 07 00 PM" src="https://github.com/IntoTheVerse/APTHorse/assets/43913734/8182b0b9-1188-4a19-91ae-71d6632c2caa">
 
